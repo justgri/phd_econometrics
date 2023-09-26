@@ -3,5 +3,5 @@ pandas
 plotly
 streamlit
 matplotlib
-sklearn
+scikit-learn
 st_pages
