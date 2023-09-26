@@ -19,8 +19,13 @@ st.title("Econometrics for PhD Students")
 st.sidebar.success("Select a page above.")
 
 st.markdown(
-    "Trying to learn and enjoy the first year Econ PhD. <br> All mistakes are my own.",
+    "Trying to learn and enjoy the first year of Econ PhD. <br> Procrastinating productively. <br> All mistakes are my own.",
     unsafe_allow_html=True,
+)
+
+st.write(
+    "Disclaimer: this might not look like PhD level stuff, because PhD and undergrad topics are largely overlapping, only the level of theoretical rigor differs.",
+    "My goal is also to master the fundamentals rather than scratch the surface of more advanced topics.",
 )
 
 

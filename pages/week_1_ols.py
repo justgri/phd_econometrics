@@ -15,6 +15,11 @@ st.write(
     "Visualizing how OLS coefficient standard errors depend on the underlying true data."
 )
 
+# Theory part
+# show matrix notation, verify that sklearn gives same as multiplying by hand
+# some experiments with projection matrices (P, M)?
+
+
 # Pseudo-code
 # Generate and display fixed data (data points, reg line, confidence interval)
 # Show table with coefficients with their standard errors
