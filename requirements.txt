@@ -3,3 +3,5 @@ pandas
 plotly
 streamlit
 matplotlib
+sklearn
+st_pages
