@@ -6,3 +6,4 @@ matplotlib
 scikit-learn
 st_pages>=0.4.3
 statsmodels
+statsmodels.api
