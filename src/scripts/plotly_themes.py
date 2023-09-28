@@ -168,4 +168,3 @@ px.colors.qualitative.G10
 px.colors.qualitative.Set1
 px.colors.qualitative.D3
 """
-print(px.colors.qualitative.G10)

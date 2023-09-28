@@ -1,208 +1,242 @@
+import os
+import sys
+
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
-from st_pages import Page, add_page_title, show_pages
+from st_pages import add_page_title
 
-import plotly_themes as thm
+import src.scripts.plotly_themes
+import src.scripts.utils as utl
 
-# Dashboard header
-add_page_title()
+### PAGE CONFIGS ###
 
-st.header("1. Ordinary Least Squares")
-st.write(
-    "Visualizing how OLS coefficient standard errors depend on the underlying true data."
-)
+st.set_page_config(layout="wide")
+utl.local_css("src/styles/styles_pages.css")
 
-# Theory part
-# show matrix notation, verify that sklearn gives same as multiplying by hand
-# some experiments with projection matrices (P, M)?
-
-
-# Pseudo-code
+### Data viz part
 # Generate and display fixed data (data points, reg line, confidence interval)
 # Show table with coefficients with their standard errors
 # Then let user to choose underlying parameters for a, b, variance of errors and N
 # Plot on the same chart and add coefficients to the table for comparison
-# Bonus: show how coef SE depends on N and var(e) analytically
+# Bonus: show how coef SE depends on N and var(e) graphically
+
+### Theory part
+# show matrix notation, verify that sklearn gives same as multiplying by hand
+# some experiments with projection matrices (P, M)?
+
+# create one column with consistent width
+s1, c01, s2 = utl.narrow_col()
+
+### PAGE START ###
+# Dashboard header
+
+with c01:
+    st.title("Week 1 - Ordinary Least Squares Estimation")
+    st.header("1. OLS Visually")
+
+    st.write(
+        "Play around with sliders to see how the data and estimates change."
+    )
+
+    st.markdown(
+        "<h3 style='text-align: left'> Visualizing how OLS estimates depend on true population parameters.</h3>",
+        unsafe_allow_html=True,
+    )
+
+    st.write(
+        r"Suppose you have the following true population relationship between $X$ and $Y$, with parameters defined by slider values."
+    )
+    st.write(
+        r"You then draw a sample of size $N$ from that population and estimate OLS coefficients, $\hat{\beta_0}$ and $\hat{\beta_1}$."
+    )
 
 
-def gen_lin_data(N, a, b, var):
-    np.random.seed(0)
+def gen_lin_data(b0, b1, var, N):
+    # np.random.seed(0)
+    # generate x
     x = np.round(np.random.uniform(-10, 10, N), 1)
+    # add constant
+    x = np.column_stack((np.ones(N), x))
+    # generate  error term
     e = np.random.normal(0, var, N)
-    y = a + b * x + e
 
-    # Fit a regression line for the variable data
-    model = LinearRegression()
-    model.fit(x.reshape(-1, 1), y)
-    y_pred = model.predict(x.reshape(-1, 1))
+    # y = xB + e
+    y = np.dot(x, np.array([b0, b1])) + e
 
-    return {"y": y, "x": x, "e": e, "y_pred": y_pred, "model": model}
+    # fit reg
+    model = sm.OLS(y, x).fit()
 
+    y_hat = model.predict(x)
 
-fixed_data = gen_lin_data(100, 0, 1, 5)
-
-# # Slider for 'a' and 'b' values
-a_cust = st.slider(
-    "Intercept B0", min_value=-5.0, max_value=5.0, value=0.0, step=0.1
-)
-b_cust = st.slider(
-    "Slope B1", min_value=-5.0, max_value=5.0, value=0.0, step=0.1
-)
-var_cust = st.slider(
-    "Error Variance", min_value=0.1, max_value=20.0, value=10.0, step=0.1
-)
-
-n_cust = st.slider(
-    "Number of Samples", min_value=10, max_value=1000, value=500, step=10
-)
-
-custom_data = gen_lin_data(n_cust, a_cust, b_cust, var_cust)
+    return {
+        "y": y,
+        "x": x,
+        "e": e,
+        "y_hat": y_hat,
+        "model": model,
+    }
 
 
-def plot_ols(data, data_custom):
+with c01:
+    st.latex(
+        r"""
+            Y_i = \beta_0 + \beta_1X_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
+        """
+    )
+    st.latex(r"""\hat{Y_i} = """ + r"""\hat{\beta_0} + \hat{\beta_1}X""")
+
+
+s1, slider_col, s2 = st.columns(3)
+
+with slider_col:
+    # Sliders
+    b0_cust = st.slider(
+        r"Intercept, $\beta_0$",
+        min_value=-10.0,
+        max_value=10.0,
+        value=0.0,
+        step=0.1,
+    )
+    b1_cust = st.slider(
+        r"Slope, $\beta_1$", min_value=-5.0, max_value=5.0, value=0.0, step=0.1
+    )
+    var_cust = st.slider(
+        r"Error variance, $var(\varepsilon) = \sigma^2$",
+        min_value=0.1,
+        max_value=20.0,
+        value=10.0,
+        step=0.1,
+    )
+
+    n_cust = st.slider(
+        "Sample size, $N$",
+        min_value=10,
+        max_value=1000,
+        value=500,
+        step=10,
+    )
+
+custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust)
+
+
+def plot_ols(data_custom):
     fig, ax = plt.subplots()
-    # Fixed data
-    ax.scatter(
-        data["x"],
-        data["y"],
-        # label="Initial Data",
-        color="blue",
-        alpha=0.5,
-    )
-
-    ax.plot(
-        data["x"],
-        data["y_pred"],
-        label=f"Reference OLS: y = {data['model'].intercept_:.2f} + {data['model'].coef_[0]:.2f}x",
-        color="blue",
-    )
+    fig.set_size_inches(3.5, 3.5)
+    plt.subplots_adjust(left=0)  # remove margin
 
     # Custom data
     ax.scatter(
-        data_custom["x"],
+        data_custom["x"][:, 1],
         data_custom["y"],
         # label="Custom Data",
-        color="green",
+        color="blue",
         alpha=0.5,
     )
 
     ax.plot(
-        data_custom["x"],
-        data_custom["y_pred"],
-        label=f"New OLS: y = {data_custom['model'].intercept_:.2f} + {data_custom['model'].coef_[0]:.2f}x",
-        color="green",
+        data_custom["x"][:, 1],
+        data_custom["y_hat"],
+        label=f"y = {data_custom['model'].params[0]:.2f} + {data_custom['model'].params[1]:.2f}x",
+        color="red",
     )
 
     plt.xlim([-11, 11])
     plt.ylim([-50, 50])
-
-    plt.legend()
+    plt.xlabel("X", fontweight="bold")
+    plt.ylabel("Y", fontweight="bold")
+    ax.yaxis.set_label_coords(-0.08, 0.5)
+    plt.legend(loc="upper left")
 
     return fig
 
 
-# Display the plot in Streamlit
-st.pyplot(plot_ols(fixed_data, custom_data))
+def create_summary(data):
+    coefficients = pd.DataFrame(
+        {
+            "Coefficient": [r"Intercept B_0", "Slope B_1"],
+            "Population": [b0_cust, b1_cust],
+            "Sample": [
+                data["model"].params[0],
+                data["model"].params[1],
+            ],
+            "Sample SE": [
+                data["model"].bse[0],
+                data["model"].bse[1],
+            ],
+            "N": [n_cust, ""],
+            "R-sq": [f"{data['model'].rsquared:.2f}", ""],
+        }
+    )
 
-# Now add a customly generated data
+    # Apply formatting to the "True Pop" and "Estimate" columns
+    coefficients[["Population", "Sample", "Sample SE"]] = coefficients[
+        ["Population", "Sample", "Sample SE"]
+    ].applymap(lambda x: f"{x:.2f}")
 
-
-# # Fixed data points and their corresponding regression line
-# x_fixed = np.array([-8, -6, -4, -2, 0, 2, 4, 6, 8])
-# y_fixed = 0.5 + 1.5 * x_fixed  # Example fixed data points
-# y_fixed_regression = 0.5 + 1.5 * x  # Fixed regression line for comparison
-
-
-# # Plot the fixed data points and their fixed regression line
-# ax.scatter(
-#     x_fixed,
-#     y_fixed,
-#     label="Data Points (Fixed Line)",
-#     color="green",
-#     marker="o",
-#     s=80,
-# )
-# ax.plot(
-#     x,
-#     y_fixed_regression,
-#     label=f"Regression Line (Fixed Line): y = 0.5 + 1.5x",
-#     linestyle="--",
-#     color="green",
-# )
-
-# ax.set_xlabel("x")
-# ax.set_ylabel("y")
-# ax.legend()
-
-# table HTML
-
-# HTML code for a table with a spanned row
-table_html = """
-<table>
-  <tr>
-    <td rowspan="2">Spanned Text</td>
-    <td>Row 1, Column 2</td>
-    <td>Row 1, Column 3</td>
-  </tr>
-  <tr>
-    <td>Row 2, Column 2</td>
-    <td>Row 2, Column 3</td>
-  </tr>
-</table>
-"""
-
-# Display the HTML table using st.markdown()
-st.markdown(table_html, unsafe_allow_html=True)
+    return coefficients
 
 
-# Add table with coefficients
+with slider_col:
+    if st.button("Resample data"):
+        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust)
 
-coefficients = pd.DataFrame(
+
+coefficients = create_summary(custom_data)
+
+# CSS styles for the table (center and header)
+table_styler = [
     {
-        "Coefficient": ["a", "b", "c", "d"],
-        "Initial Value": [1, 2, 3, 4],
-        "Regression Coefficient": [3, 4, 5, 6],
-        "Data Points (N)": [5, 6, 7, 8],
-    }
-)
-
-# Apply CSS styles to the DataFrame for improved table appearance
-styles = [
-    {
-        "selector": "td",
-        "props": [("font-size", "14px"), ("text-align", "center")],
+        "selector": "th",  # Apply to header cells
+        "props": [("background-color", "lightblue")],
     },
     {
-        "selector": "th",
-        "props": [("font-size", "16px"), ("text-align", "center")],
-    },
-    {
-        "selector": "tr:nth-child(odd)",
-        "props": [("background-color", "grey")],
-    },
-    {
-        "selector": "tr:nth-child(even)",
-        "props": [("background-color", "white")],
-    },
-    {
-        "selector": "tr:first-child",
-        "props": [("background-color", "lightgrey")],
+        "selector": "td",  # Apply to data cells
+        "props": [
+            ("font-size", "14px"),
+            ("text-align", "center"),
+            ("background-color", "white"),
+        ],
     },
 ]
 
-st.write(
-    """
-<style>
-td, th {
-    padding: 8px;
-    font-family: Arial, sans-serif;
-}
-</style>
-""",
-    unsafe_allow_html=True,
-)
+# Apply CSS styles to the DataFrame
+styled_coefficients = coefficients.style.set_table_styles(table_styler)
 
-st.table(coefficients.style.set_table_styles(styles))
+# Create a centered and styled HTML representation of the DataFrame
+styled_table = styled_coefficients.hide(axis="index").to_html()
+
+# Define custom CSS to style the table and center it
+table_css = """
+<style>
+    table {
+        margin: 0 auto;
+        text-align: center;
+    }
+</style>
+"""
+
+s0, c02, s1 = utl.narrow_col()
+
+
+with c02:
+    # display table and plot
+    st.write(
+        f"{table_css}{styled_table}",
+        unsafe_allow_html=True,
+    )
+    st.write("")
+
+    st.pyplot(plot_ols(custom_data))
+
+with c02:
+    st.header("2. Matrix notation for OLS")
+    st.write("Check out Matteo Courthoud's website for more details:")
+    st.link_button(
+        "OLS Algebra",
+        "https://matteocourthoud.github.io/course/metrics/05_ols_algebra/",
+        type="primary",
+    )

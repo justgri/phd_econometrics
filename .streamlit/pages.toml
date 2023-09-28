@@ -1,0 +1,9 @@
+[[pages]]
+path = "homepage.py"
+name = "Introduction"
+icon = "🏠"
+
+[[pages]]
+path = "pages/week_1_ols.py"
+name = "Week 1 - OLS"
+icon = "📖"
