@@ -29,7 +29,7 @@ utl.local_css("src/styles/styles_pages.css")
 # some experiments with projection matrices (P, M)?
 
 # create one column with consistent width
-s1, c01, s2 = utl.narrow_col()
+s1, c01, s2 = utl.wide_col()
 
 ### PAGE START ###
 # Dashboard header
@@ -232,7 +232,10 @@ with c02:
 
     st.pyplot(plot_ols(custom_data))
 
-with c02:
+s0, c03, s1 = utl.wide_col()
+
+
+with c03:
     st.header("2. Matrix notation for OLS")
     st.write("Check out Matteo Courthoud's website for more details:")
     st.link_button(
