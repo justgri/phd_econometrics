@@ -1,2 +1,6 @@
 *.docx
 *.doc
+data/
+backup/
+**/backup/
+

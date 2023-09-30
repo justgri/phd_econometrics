@@ -1,3 +1,4 @@
+import matplotlib.cm as cm
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.io as pio
@@ -153,7 +154,11 @@ pio.templates["my_streamlit"] = go.layout.Template(
     ),
 )
 
-my_colors = px.colors.qualitative.G10
+cols_g10 = px.colors.qualitative.G10
+cols_set1 = px.colors.qualitative.Set1
+
+cols_set1_plt = cm.Set1.colors
+
 
 """
 Color templates

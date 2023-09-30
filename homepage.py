@@ -1,7 +1,7 @@
 import streamlit as st
 from st_pages import Page, add_page_title, show_pages, show_pages_from_config
 
-import src.scripts.plotly_themes
+import scripts.plot_themes
 import src.scripts.utils as utl
 
 st.set_page_config(
@@ -35,10 +35,11 @@ with c1:
     st.markdown(
         """**Disclaimer:** <br>
         This website does not represent the official curriculum taught at my university. <br>
-        My goal is to master the fundamentals rather than scratch the surface of more advanced topics. <br>
+        My goal is to master the fundamentals of a few topics rather than scratch the surface of many. <br>
         It might not even look like PhD level stuff, because topics are largely overlapping with the undergraduate course. <br>
         """,
         # Main difference is matrix algebra and proving everything along the way, which might not always be included here.
+        # Hopefully it will give insights to both PhD students, undergrads, and others.
         unsafe_allow_html=True,
     )
 

@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 
 import numpy as np
@@ -9,12 +10,15 @@ from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from st_pages import add_page_title
 
+import src.scripts.plot_themes as thm
 import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
 st.set_page_config(layout="wide")
 utl.local_css("src/styles/styles_pages.css")
+
+random_seed = 0
 
 ### Data viz part
 # Generate and display fixed data (data points, reg line, confidence interval)
@@ -54,8 +58,8 @@ with c01:
     )
 
 
-def gen_lin_data(b0, b1, var, N):
-    # np.random.seed(0)
+def gen_lin_data(b0, b1, var, N, rseed):
+    np.random.seed(rseed)
     # generate x
     x = np.round(np.random.uniform(-10, 10, N), 1)
     # add constant
@@ -119,28 +123,55 @@ with slider_col:
         step=10,
     )
 
-custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust)
+
+custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 
 
-def plot_ols(data_custom):
+def plot_ols(data_custom, b0, b1):
     fig, ax = plt.subplots()
     fig.set_size_inches(3.5, 3.5)
     plt.subplots_adjust(left=0)  # remove margin
 
-    # Custom data
+    # Sample data
     ax.scatter(
         data_custom["x"][:, 1],
         data_custom["y"],
         # label="Custom Data",
-        color="blue",
+        color=thm.cols_set1_plt[1],
         alpha=0.5,
     )
+
+    include_pop = False
+    if include_pop:
+        # True pop line
+        x_values = np.linspace(-10, 10, 100)
+        y_values = b0 + b1 * x_values
+        if b1 >= 0:
+            label = rf"$\bar{{y}} = {b0:.2f} + {b1:.2f}x$"
+        else:
+            label = rf"$\hat{{y}} = {b0:.2f} - {-b1:.2f}x$"
+
+        ax.plot(
+            x_values,
+            y_values,
+            label=label,
+            color=thm.cols_set1_plt[1],
+        )
+
+    # Sample line
+    b0_s = data_custom["model"].params[0]
+    b1_s = data_custom["model"].params[1]
+
+    if b1_s >= 0:
+        label_s = rf"$\hat{{y}} = {b0_s:.2f} + {b1_s:.2f}x$"
+    else:
+        label_s = rf"$\hat{{y}} = {b0_s:.2f} - {-b1_s:.2f}x$"
 
     ax.plot(
         data_custom["x"][:, 1],
         data_custom["y_hat"],
-        label=f"y = {data_custom['model'].params[0]:.2f} + {data_custom['model'].params[1]:.2f}x",
-        color="red",
+        label=label_s,
+        color=thm.cols_set1_plt[4],
     )
 
     plt.xlim([-11, 11])
@@ -148,7 +179,7 @@ def plot_ols(data_custom):
     plt.xlabel("X", fontweight="bold")
     plt.ylabel("Y", fontweight="bold")
     ax.yaxis.set_label_coords(-0.08, 0.5)
-    plt.legend(loc="upper left")
+    plt.legend(loc="upper left", fontsize="small")
 
     return fig
 
@@ -166,8 +197,6 @@ def create_summary(data):
                 data["model"].bse[0],
                 data["model"].bse[1],
             ],
-            "N": [n_cust, ""],
-            "R-sq": [f"{data['model'].rsquared:.2f}", ""],
         }
     )
 
@@ -181,7 +210,10 @@ def create_summary(data):
 
 with slider_col:
     if st.button("Resample data"):
-        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust)
+        random_seed = random.randint(0, 10000)
+        custom_data = gen_lin_data(
+            b0_cust, b1_cust, var_cust, n_cust, random_seed
+        )
 
 
 coefficients = create_summary(custom_data)
@@ -220,7 +252,6 @@ table_css = """
 
 s0, c02, s1 = utl.narrow_col()
 
-
 with c02:
     # display table and plot
     st.write(
@@ -229,9 +260,26 @@ with c02:
     )
     st.write("")
 
-    st.pyplot(plot_ols(custom_data))
+    st.latex(f"N= {n_cust} , R^2 = {custom_data['model'].rsquared:.2f}")
+
+    st.pyplot(plot_ols(custom_data, b0_cust, b1_cust))
+
 
 s0, c03, s1 = utl.wide_col()
+
+with c03:
+    st.markdown(
+        "<h3 style='text-align: left'> Interesting takeaways.</h3>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        r"""
+    1. $R^2 = 0$ if $\beta=0$, because:
+    2. $\hat{\beta}$ standard errors do not depend on true $\beta$, only on $var(\varepsilon)$ and $N$, because: 
+""",
+        unsafe_allow_html=True,
+    )
 
 
 with c03:
