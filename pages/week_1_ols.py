@@ -9,7 +9,6 @@ from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from st_pages import add_page_title
 
-import src.scripts.plotly_themes
 import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
@@ -236,10 +235,13 @@ s0, c03, s1 = utl.wide_col()
 
 
 with c03:
-    st.header("2. Matrix notation for OLS")
+    st.header("2. OLS in matrix notation")
     st.write("Check out Matteo Courthoud's website for more details:")
     st.link_button(
         "OLS Algebra",
         "https://matteocourthoud.github.io/course/metrics/05_ols_algebra/",
         type="primary",
     )
+
+    st.header("3. OLS assumptions")
+    st.header("4. Proofs to remember")
