@@ -1,7 +1,7 @@
 import streamlit as st
 from st_pages import Page, add_page_title, show_pages, show_pages_from_config
 
-import scripts.plot_themes
+import src.scripts.plot_themes
 import src.scripts.utils as utl
 
 st.set_page_config(
