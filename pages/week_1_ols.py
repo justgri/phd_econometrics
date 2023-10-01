@@ -4,14 +4,13 @@ import sys
 
 import numpy as np
 import pandas as pd
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from st_pages import add_page_title
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -41,9 +40,7 @@ with c01:
     st.title("Week 1 - Ordinary Least Squares Estimation")
     st.header("1. OLS Visually")
 
-    st.write(
-        "Play around with sliders to see how the data and estimates change."
-    )
+    st.write("Play around with sliders to see how the data and estimates change.")
 
     st.markdown(
         "<h3 style='text-align: left'> Visualizing how OLS estimates depend on true population parameters.</h3>",
@@ -122,7 +119,6 @@ with slider_col:
         value=500,
         step=10,
     )
-
 
 custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 
@@ -209,11 +205,9 @@ def create_summary(data):
 
 
 with slider_col:
-    if st.button("Resample data"):
+    if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(
-            b0_cust, b1_cust, var_cust, n_cust, random_seed
-        )
+        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 
 
 coefficients = create_summary(custom_data)
