@@ -17,7 +17,7 @@ def wide_col():
 
 
 def narrow_col():
-    return st.columns((0.5, 1, 0.5))
+    return st.columns((0.35, 1, 0.35))
 
 
 def two_cols():

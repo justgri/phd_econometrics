@@ -1,3 +1,11 @@
+body .stMarkdown {
+    font-size: 20px;
+}
+
+html {
+    font-size: 20px;
+}
+
 /* Reduce gap between elements */
 [data-testid=column]:nth-of-type(n) [data-testid=stVerticalBlock] {
     gap: 1rem;

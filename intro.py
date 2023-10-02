@@ -6,7 +6,7 @@ import src.scripts.utils as utl
 
 st.set_page_config(
     page_title="PhD Econometrics",
-    page_icon="👋",
+    page_icon="📈",
     layout="wide",
 )
 
@@ -18,9 +18,10 @@ show_pages_from_config()
 
 s1, c1, c2 = utl.wide_col()
 
-# my LinkedIn and GitHub
+# my LinkedIn, GitHub, and email
 linkedin_url = "https://www.linkedin.com/in/justinas-grigaitis/"
 github_url = "https://github.com/justgri"
+email_url = "mailto:justinas.grigaitis@econ.uzh.ch"
 
 # Intro
 with c1:
@@ -36,7 +37,7 @@ with c1:
         """**Disclaimer:** <br>
         This website does not represent the official curriculum taught at my university. <br>
         My goal is to master the fundamentals of a few topics rather than scratch the surface of many. <br>
-        It might not even look like PhD level stuff, because topics are largely overlapping with the undergraduate course. <br>
+        It might not even look like PhD level stuff, because topics are largely overlapping with the undergraduate courses. <br>
         """,
         # Main difference is matrix algebra and proving everything along the way, which might not always be included here.
         # Hopefully it will give insights to both PhD students, undergrads, and others.
@@ -45,9 +46,12 @@ with c1:
 
     st.markdown(
         f"""
-        Please send me comments: 
+        Please send me corections and suggestions: 
     <a href="{linkedin_url}" target="_blank">
         <i class="fab fa-linkedin fa-lg"></i>
+    </a>
+    <a href="{email_url}" target="_blank">
+        <i class="fas fa-envelope fa-lg"></i>
     </a>
     <a href="{github_url}" target="_blank">
         <i class="fab fa-github fa-lg"></i>
@@ -281,12 +285,12 @@ with c2:
         "It's the residual variance that matters" <br>
         Take $\mathbf{y}$ and two sets of regressors $\mathbf{X}_1$ and $\mathbf{X}_2$.
         FWL theorem claims that $\mathbf{b}_2$ will be equal after estimating in the following two forms:<br>
-        A. $\mathbf{y} = \mathbf{X}_1 \mathbf{b}_1 + \mathbf{X}_2 \mathbf{b}_2 + \mathbf{e}$,
+        $\mathbf{y} = \mathbf{X}_1 \mathbf{b}_1 + \mathbf{X}_2 \mathbf{b}_2 + \mathbf{e}$,
                 then $\mathbf{b}_2 = (\mathbf{X}_2'\mathbf{X}_2)^{-1}\mathbf{X}_2'\mathbf{y}$ <br>
-        B. $\mathbf{y}^* = \mathbf{X}^*_2 \mathbf{b}_2 + \mathbf{e}$,
+        $\mathbf{y}^* = \mathbf{X}^*_2 \mathbf{b}_2 + \mathbf{e}$,
           then $\mathbf{b}_2 = (\mathbf{X}^{* \prime}_2 \mathbf{X}^{*}_2 )^{-1} \mathbf{X}^{* \prime}_2 \mathbf{y}^*$, 
                 where $\mathbf{X}^*_2 = \mathbf{M}_1 \mathbf{X}_2$ and $\mathbf{y}^* = \mathbf{M}_1 \mathbf{y}$<br>
-        Explanation for B:<br>
+        Explanation for notation in the second form:<br>
          i. Regress $\mathbf{y}$ on $\mathbf{X}_1$ and get the residuals $\mathbf{M}_1 \mathbf{y}$<br>
          ii. Regress $\mathbf{X}_2$ on $\mathbf{X}_1$ and get the residuals $\mathbf{M}_{1} \mathbf{X}_2$ <br>
          iii. Regress $\mathbf{M}_1 \mathbf{y}$ (residuals from i.) on $\mathbf{M}_1 \mathbf{X}_2$ (residuals from ii.), which will give $\mathbf{b}_2$ <br>
