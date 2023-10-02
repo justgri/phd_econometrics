@@ -4,14 +4,13 @@ import sys
 
 import numpy as np
 import pandas as pd
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -41,9 +40,7 @@ with c01:
     st.title("Week 1 - Ordinary Least Squares Estimation")
     st.header("1. OLS Visually")
 
-    st.write(
-        "Play around with sliders to see how the data and estimates change."
-    )
+    st.write("Play around with sliders to see how the data and estimates change.")
 
     st.markdown(
         "<h3 style='text-align: left'> Visualizing how OLS estimates depend on true population parameters</h3>",
@@ -248,9 +245,7 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(
-            b0_cust, b1_cust, var_cust, n_cust, random_seed
-        )
+        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 
 
 coefficients = create_summary(custom_data)
@@ -305,9 +300,7 @@ with c02:
     )
 
     _, col_plot, _ = utl.narrow_col()
-    col_plot.pyplot(
-        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
-    )
+    col_plot.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
 
 
 s0, c03, s1 = utl.wide_col()
@@ -336,7 +329,7 @@ with c03:
     It depends on variance of errors $s^2$ (and thus $\sigma^2)$, $N-k$. and $X'X$.<br>
     Note that higher variance of $X$ leads to a lower variance of $\hat{\beta}$, which is intuitive because you cover a wider range of $X$s.<br>
     
-    $\widehat{var(\mathbf{b}| \mathbf{X})} \equiv s^{2} \cdot (X'X)^{-1} = \frac{\mathbf{e'e}}{N - k} \dot (X'X)^{-1}$
+        $\widehat{var(\mathbf{b}| \mathbf{X})} \equiv s^2 (X'X)^{-1} = \frac{\mathbf{e'e}}{N - k} \dot (X'X)^{-1}$
 """,
         unsafe_allow_html=True,
     )
