@@ -3,4 +3,5 @@
 data/
 backup/
 **/backup/
-
+__pycache__/
+**/__pycache__/

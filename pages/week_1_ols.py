@@ -9,7 +9,6 @@ import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
-from sklearn.linear_model import LinearRegression
 from st_pages import add_page_title
 
 ### PAGE CONFIGS ###

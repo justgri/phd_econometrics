@@ -1,5 +1,10 @@
-https://www.jennifer-la-o.com/macroeconomic-analysis-i
-
-Stokey, Nancy L., et al. Recursive Methods in Economic Dynamics. Harvard University Press, 1989. JSTOR, https://doi.org/10.2307/j.ctvjnrt76. Accessed 26 Sept. 2023.
-
-Ljungqvist, Lars & Sargent, Thomas J., 2012. "Recursive Macroeconomic Theory, Third Edition," MIT Press Books, The MIT Press, edition 3, volume 1, number 0262018748, February.
+https://pages.stern.nyu.edu/~wgreene/Econometrics/Notes.htm
+https://ocw.mit.edu/courses/14-382-econometrics-spring-2017/pages/lecture-notes/
+https://matteocourthoud.github.io/course/metrics/
+https://www.youtube.com/watch?v=GMVh02WGhoc&list=PLwJRxp3blEvaxmHgI2iOzNP6KGLSyd4dz
+https://www.econometrics-with-r.org/
+https://www.sv.uio.no/econ/om/tall-og-fakta/nobelprisvinnere/ragnar-frisch/published-scientific-work/rf-published-scientific-works/rf1933c.pdf
+https://www.jstor.org/stable/i332704
+https://docs.google.com/document/d/1GQ3qlD0_cNQdkh_iT-dBDXwNVIXk27WCZtmQ3Sgxz1o/mobilebasic#id.f68ahvvbxdaj
+https://twitter.com/jmwooldridge
+https://bookdown.org/ts_robinson1994/10EconometricTheorems/
