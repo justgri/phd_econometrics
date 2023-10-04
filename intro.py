@@ -170,7 +170,7 @@ with c2:
     <div class="numbered">
         1. OLS algebra (Greene Ch 2 - 3.2) <br>
         2. FWL and Goodness of fit measures (Greene Ch 3.3 - 4) <br>
-        3. Hypothesis testing (Greene Ch 5)
+        3. Hypothesis testing (Greene Ch 5) <br>
         4. Omitted Variable Bias (Greene Ch 4)<br>
         
     </div>
@@ -256,7 +256,7 @@ with c2:
         4. **Linear Projection and its Properties** <br>
         $\mathbf{P} \equiv \mathbf{X}(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'$ and $\mathbf{M} \equiv \mathbf{I}_n - \mathbf{P}$ <br> 
         $\mathbf{P}\mathbf{X} = \mathbf{X}$ ("projection") and $\mathbf{M}\mathbf{X} = \mathbf{0}$ ("annihilator") <br>
-        Also $\hat{\mathbf{y}} = \mathbf{P}\mathbf{y}$ ("hat") and $\hat{\mathbf{e}} = \mathbf{M}\mathbf{y}$ ("residual maker") <br>
+        Also $\hat{\mathbf{y}} = \mathbf{P}\mathbf{y}$ ("hat") and $\mathbf{e} = \mathbf{M}\mathbf{y}$ ("residual maker") <br>
 
         5. **Weak Law of Large Numbers, Central Limit Theorem** <br>
         Weak LLN: $\lim_{n\to\infty}\Pr\!\left(\,|\overline{X}_n-\mu| < \varepsilon\,\right) = 1$, where $\varepsilon > 0$<br>

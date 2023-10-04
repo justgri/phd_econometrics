@@ -5,5 +5,5 @@ icon = "🏠"
 
 [[pages]]
 path = "pages/week_1_ols.py"
-name = "Week 1 - OLS"
+name = "1. OLS"
 icon = "📖"

@@ -4,17 +4,22 @@ import sys
 
 import numpy as np
 import pandas as pd
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
 
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
+
 ### PAGE CONFIGS ###
 
-st.set_page_config(layout="wide")
+st.set_page_config(
+    page_title="PhD Econometrics - OLS",
+    page_icon="📈",
+    layout="wide",
+)
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0
@@ -37,57 +42,56 @@ s1, c01, s2 = utl.wide_col()
 # Dashboard header
 
 with c01:
-    st.title("Week 1 - Ordinary Least Squares Estimation")
-    st.header("1. OLS Visually")
+    st.title("Ordinary Least Squares Estimation")
+    st.header("1. Visualizing OLS estimates")
 
-    st.write("Play around with sliders to see how the data and estimates change.")
-
-    st.markdown(
-        "<h3 style='text-align: left'> Visualizing how OLS estimates depend on true population parameters</h3>",
-        unsafe_allow_html=True,
+    st.write(
+        "Play around with sliders to see how the data and estimates change."
     )
-
     st.write(
         r"Suppose you have the following true population relationship between $X$ and $Y$, with parameters defined by slider values."
     )
     st.write(
-        r"You then draw a sample of size $N$ from that population and estimate OLS coefficients, $\hat{\beta_0}$ and $\hat{\beta_1}$."
+        r"You then draw a sample of size $n$ from that population and estimate OLS coefficients, $\hat{\beta_0}$ and $\hat{\beta_1}$."
     )
 
 
 def gen_lin_data(b0, b1, sd, N, rseed):
     np.random.seed(rseed)
-    # generate x
-    x = np.round(np.random.uniform(-10, 10, N), 1)
-    # add constant
-    x = np.column_stack((np.ones(N), x))
-    # generate  error term
-    e = np.random.normal(0, sd, N)
+    # generate X
+    K = 2
+    X = np.random.uniform(-10, 10, (N, K - 1))
+    X = np.column_stack((np.ones(N), X))
 
-    # y = xB + e
-    y = np.dot(x, np.array([b0, b1])) + e
+    # generate  error term
+    eps = np.random.normal(0, sd, N)
+
+    # y = xB + eps
+    y = np.dot(X, np.array([b0, b1])) + eps
 
     # fit reg
-    model = sm.OLS(y, x).fit()
+    model = sm.OLS(y, X).fit()
 
     # get fitted values and CI
-    predictions = model.get_prediction(x)
+    predictions = model.get_prediction(X)
     y_hat = predictions.predicted_mean
     y_hat_se = predictions.se_mean
 
-    # get confidence interval
+    # get 95% confidence interval
     ci = predictions.conf_int(alpha=0.05)  # 95% CI
-    deg_freedom = x.shape[0] - x.shape[1]  # N - k
+    deg_freedom = X.shape[0] - X.shape[1]  # n - K
+
+    # get CI manually - not needed
     # t_score = t.ppf(0.975, deg_freedom)
     # ci = np.column_stack(
     #     (y_hat - t_score * y_hat_se, y_hat + t_score * y_hat_se)
     # )
 
-    # get error parameters
-    e_hat = y - y_hat
-    s = np.sqrt(np.sum(e_hat**2) / deg_freedom)
+    # get error parameters - not needed
+    e = y - y_hat
+    s = np.sqrt(np.sum(e**2) / deg_freedom)
 
-    # calculate R^2 manually
+    # calculate R^2 manually - not needed
     y_bar = np.mean(y)
     ss_tot = np.sum((y - y_bar) ** 2)
     ss_res = np.sum((y - y_hat) ** 2)
@@ -95,14 +99,11 @@ def gen_lin_data(b0, b1, sd, N, rseed):
 
     return {
         "y": y,
-        "x": x,
-        "e": e,
-        "e_hat": e_hat,
-        "y_hat": y_hat,
+        "x": X,
         "s": s,
+        "y_hat": y_hat,
         "ci": ci,
         "model": model,
-        "r_squared": r_squared,
     }
 
 
@@ -115,7 +116,7 @@ with c01:
     st.latex(r"""\hat{Y_i} = """ + r"""\hat{\beta_0} + \hat{\beta_1}X""")
 
 
-s1, slider_col, s2 = st.columns(3)
+slider_col, s1, chart_col = st.columns((0.8, 0.1, 1))
 
 with slider_col:
     # Sliders
@@ -138,7 +139,7 @@ with slider_col:
     )
 
     n_cust = st.slider(
-        "Sample size, $N$",
+        "Sample size, $n$",
         min_value=10,
         max_value=1000,
         value=500,
@@ -245,10 +246,18 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
+        custom_data = gen_lin_data(
+            b0_cust, b1_cust, var_cust, n_cust, random_seed
+        )
 
 
 coefficients = create_summary(custom_data)
+
+with chart_col:
+    chart_col.pyplot(
+        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
+    )
+
 
 # CSS styles for the table (center and header)
 table_styler = [
@@ -293,23 +302,16 @@ with c02:
     st.write("")
 
     st.latex(
-        f"N= {n_cust} ,"
+        f"n= {n_cust} ,"
         + f"R^2 = {custom_data['model'].rsquared:.2f}"
-        + r", s = \sqrt{\frac{\mathbf{e'e}}{N - k}}"
+        + r", s = \sqrt{\frac{\mathbf{e'e}}{n - K}}"
         + f"= {custom_data['s']:.2f}"
     )
-
-    _, col_plot, _ = utl.narrow_col()
-    col_plot.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
-
 
 s0, c03, s1 = utl.wide_col()
 
 with c03:
-    st.markdown(
-        "<h3 style='text-align: left'> Interesting takeaways</h3>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("### Interesting takeaways")
 
     st.markdown(
         r"""
@@ -329,7 +331,7 @@ with c03:
     It depends on variance of errors $s^2$ (and thus $\sigma^2)$, $N-k$. and $X'X$.<br>
     Note that higher variance of $X$ leads to a lower variance of $\hat{\beta}$, which is intuitive because you cover a wider range of $X$s.<br>
     
-        $\widehat{var(\mathbf{b}| \mathbf{X})} \equiv s^2 (X'X)^{-1} = \frac{\mathbf{e'e}}{N - k} \dot (X'X)^{-1}$
+        $\widehat{var(\mathbf{b}| \mathbf{X})} \equiv s^2 (X'X)^{-1} = \frac{\mathbf{e'e}}{n - K} (X'X)^{-1}$
 """,
         unsafe_allow_html=True,
     )
@@ -358,5 +360,195 @@ with c03:
         unsafe_allow_html=True,
     )
 
-    st.header("4. Proofs to remember")
-    st.write("TBD")
+s0, c04, s1 = utl.wide_col()
+
+with c04:
+    st.header("4. Theory with Code")
+
+    def tabs_code_theory():
+        return st.tabs(["Theory", "Code numpy", "Code statsmodels"])
+
+    st.markdown(
+        "#### Solving for OLS coefficients",
+        unsafe_allow_html=True,
+    )
+    # OLS Theory vs Code
+    f1_c1, f1_c2, f1_c3 = tabs_code_theory()
+    with f1_c1:
+        st.markdown(
+            r"""
+            Let $\mathbf{x}_i$ and $\beta$ be $K \times 1$ vectors, and $\mathbf{X}$ be $n \times K$ matrix of $\mathbf{x}_i$<br>
+            $y_i = \mathbf{x}_i' \beta + \varepsilon_i, (i = 1, 2, ..., n)$<br>
+            $\mathbf{y = X \beta + \varepsilon}$<br>
+            <br>
+            Let $\mathbf{e \equiv y - Xb}$ and solve for $\mathbf{b}$ that minimizes $\mathbf{e'e}$<br>
+            $\mathbf{b = (X'X)^{-1}X'y}$ is then the OLS estimate $\beta$<br>
+            $\mathbf{\hat{y} = X b}$ <br>
+    """,
+            unsafe_allow_html=True,
+        )
+
+    with f1_c2:
+        ols_code = """
+        import numpy as np
+        # Define initial parameters
+        n = 1000 # sample size
+        K = 2 # number of variables and coefficients
+        sigma = 1 # standard deviation of error term
+        X = np.random.uniform(-10, 10, (n, K - 1)) # generate random X
+        X = np.column_stack((np.ones(n), X)) # add constant
+        beta = np.random.uniform(-5, 5, K) # generate random true beta
+        eps = np.random.normal(0, sigma, n) # generate random errors (disturbances)
+
+        # Generate true y
+        y = np.dot(X, beta) + eps
+
+        # Solve for OLS coefficients
+        b_ols = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(y)
+        y_hat = X.dot(b_ols)
+        e = y - y_hat
+
+        # Get projection and residual maker matrices
+        P = X.dot(np.linalg.inv(X.T.dot(X))).dot(X.T)
+        M = np.eye(n) - P
+
+        """
+        st.code(ols_code, language="python")
+
+    with f1_c3:
+        ols_code_b = """
+        import statsmodels.api as sm
+        # Generate data with numpy same as before
+        # ...
+
+        # Fit OLS model with statsmodels
+        model = sm.OLS(y, X).fit()
+        b_ols = model.params
+        y_hat = model.predict(X)
+        e = model.resid
+
+        # statsmodels does not have built-in P and M matrices
+        # since you can pull necessary estimates from model.get_prediction(X)
+
+        """
+
+        st.code(ols_code_b, language="python")
+
+    st.divider()
+
+    ### OLS Additional Concepts
+    st.markdown(
+        "#### World of Errors",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        """NB: this got me confused for a minute because Hayashi and Greene classically disagree on what SSR means, so I'll follow Greene.""",
+        unsafe_allow_html=True,
+    )
+
+    f2_c1, f2_c2, f2_c3 = tabs_code_theory()
+    with f2_c1:
+        st.markdown(
+            r"""
+            Error Sum of Squares (SSE) aka Sum of Squared Residuals (SSR or RSS, hence confusion):<br>
+            $SSE = \sum_{i=1}^n (y_i-\hat{y_i})^2 = \sum_{i=1}^n (e_i)^2 =  \mathbf{e'e = \varepsilon' M \varepsilon}$ (this is SSR according to Hayashi)<br>
+
+            Regression sum of squares (SSR) aka Explained Sum of Squares (ESS):<br>
+            $SSR = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{\hat{y}})^2$<br>
+            $SSR =  \mathbf{b'X'M^0Xb}$, where $\mathbf{M^0}$ is the centering matrix<br>
+
+            Total sum of squares (SST) aka Total Variation:<br>
+            $SST = \sum_{i=1}^n (y_i-\bar{y_i})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 + \sum_{i=1}^n (e_i)^2$ <br>
+            $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e = SSR + SSE}$<br>
+            
+            OLS estimate of $\sigma^2$ aka Standard Error of the Regression (SER):<br>
+            $s^2 \equiv \frac{SSE}{n-K} = \frac{\mathbf{e'e}}{n-K}$<br>
+            $SER = \sqrt{s^2} = s$ (think of MSE)<br>
+            <br>
+
+            Sampling error:<br>
+            $\mathbf{b} - \beta = \mathbf{(X'X)^{-1}X'y - \beta} = \mathbf{(X'X)^{-1}X' \varepsilon}$ (sampling error)<br>
+            
+            Conditional variance of $\mathbf{b}$ and standard error of $b_k$:<br>
+            $Var(\mathbf{b|X}) = s^2(X'X)^{-1}$<br>
+            $SE(b_k) = \{[s^2(X'X)^{-1}]_{kk}\}^{1/2}$<br>
+            (square root of *k*th diagonal element of variance matrix)
+         """,
+            unsafe_allow_html=True,
+        )
+
+    with f2_c2:
+        ols_code_err = """
+        import numpy as np
+        # TBD
+        """
+        st.code(ols_code_err, language="python")
+
+    with f2_c3:
+        ols_code_err_b = """
+        import statsmodels.api as sm
+        # TBD
+
+        """
+
+        st.code(ols_code_err_b, language="python")
+
+    st.divider()
+
+    st.markdown("#### $R^2$ centered and $R^2$ adjusted")
+    st.markdown(
+        r"""NB: this requires a constant term to be included in the model, i.e. $\mathbf{X}$ contains a column of 1s.""",
+        unsafe_allow_html=True,
+    )
+
+    f3_c1, f3_c2, f3_c3 = tabs_code_theory()
+
+    with f3_c1:
+        st.markdown(
+            r"""            
+            $R^2 = \frac{SSR}{SST} = \frac{SSR}{SSR + SSE} = 1 - \frac{SRR}{SSE}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
+            <br>
+            $R_{adj}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$""",
+            unsafe_allow_html=True,
+        )
+
+    with f3_c2:
+        r2_code = """
+        import numpy as np
+        e_dot_e = e.dot(e)
+        y_bar = np.mean(y)
+        y_centered = y - y_bar
+        y_M0_y = y_centered.dot(y_centered)
+        r_sq = 1 - e_dot_e / y_M0_y
+        r_sq_adj = 1 - ((n - 1) / (n - K)) * (1 - r_sq)
+        """
+        st.code(r2_code, language="python")
+
+    with f3_c3:
+        r2_code_built_in = """
+        import statsmodels.api as sm
+        model = sm.OLS(y, x).fit()
+        r_sq = model.rsquared
+        r_sq_adj = model.rsquared_adj
+        """
+
+        st.code(r2_code_built_in, language="python")
+    st.divider()
+
+s0, c05, s1 = utl.wide_col()
+with c05:
+    st.header("5. Proofs to remember")
+    sst_proof = "https://stats.stackexchange.com/questions/207841/why-is-sst-sse-ssr-one-variable-linear-regression/401299#401299"
+
+    with st.expander("SST = SSR + SSE"):
+        st.markdown(
+            rf"Proof from Greene (also see [Stack Exchange]({sst_proof})):<br>"
+            + r"""
+                $y_i - \bar{y} = \mathbf{x}_i'\mathbf{b} + e_i$<br>
+                $y_i - \bar{y} = \hat{y}_i - \bar{y} + e_i = (\mathbf{x}_i - \mathbf{\bar{x}})'\mathbf{b} + e_i$<br>
+                $\mathbf{M^0y= M^0Xb + M^0e}$<br>
+                $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e} = SSR + SSE$<br>
+                (need to expand between last two steps, but main trick is that $\mathbf{e'M^0X = e'X=0}$)<br>
+                """,
+            unsafe_allow_html=True,
+        )
