@@ -4,14 +4,13 @@ import sys
 
 import numpy as np
 import pandas as pd
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -45,9 +44,7 @@ with c01:
     st.title("Ordinary Least Squares Estimation")
     st.header("1. Visualizing OLS estimates")
 
-    st.write(
-        "Play around with sliders to see how the data and estimates change."
-    )
+    st.write("Play around with sliders to see how the data and estimates change.")
     st.write(
         r"Suppose you have the following true population relationship between $X$ and $Y$, with parameters defined by slider values."
     )
@@ -246,17 +243,13 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(
-            b0_cust, b1_cust, var_cust, n_cust, random_seed
-        )
+        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 
 
 coefficients = create_summary(custom_data)
 
 with chart_col:
-    chart_col.pyplot(
-        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
-    )
+    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
 
 
 # CSS styles for the table (center and header)
@@ -384,6 +377,14 @@ with c04:
             Let $\mathbf{e \equiv y - Xb}$ and solve for $\mathbf{b}$ that minimizes $\mathbf{e'e}$<br>
             $\mathbf{b = (X'X)^{-1}X'y}$ is then the OLS estimate $\beta$<br>
             $\mathbf{\hat{y} = X b}$ <br>
+            <br>
+            $\mathbf{P_{n \times n} \equiv X(X'X)^{-1}X'}$ is the projection or hat matrix<br>
+            $\mathbf{PX = P}$ and $\mathbf{Py = \hat{y}}$<br>
+            <br>
+            $\mathbf{M_{n \times n} \equiv I_n - P}$ is the annihilator or residual maker matrix<br>
+            $\mathbf{MX = 0}$ and $\mathbf{My = e}$<br>
+            
+
     """,
             unsafe_allow_html=True,
         )
@@ -464,15 +465,14 @@ with c04:
             OLS estimate of $\sigma^2$ aka Standard Error of the Regression (SER):<br>
             $s^2 \equiv \frac{SSE}{n-K} = \frac{\mathbf{e'e}}{n-K}$<br>
             $SER = \sqrt{s^2} = s$ (think of MSE)<br>
-            <br>
-
+        
             Sampling error:<br>
             $\mathbf{b} - \beta = \mathbf{(X'X)^{-1}X'y - \beta} = \mathbf{(X'X)^{-1}X' \varepsilon}$ (sampling error)<br>
             
             Conditional variance of $\mathbf{b}$ and standard error of $b_k$:<br>
             $Var(\mathbf{b|X}) = s^2(X'X)^{-1}$<br>
             $SE(b_k) = \{[s^2(X'X)^{-1}]_{kk}\}^{1/2}$<br>
-            (square root of *k*th diagonal element of variance matrix)
+            (square root of *k*th diagonal element of the variance matrix)
          """,
             unsafe_allow_html=True,
         )
@@ -480,15 +480,55 @@ with c04:
     with f2_c2:
         ols_code_err = """
         import numpy as np
-        # TBD
+
+        # Sum of squared errors
+        SSE = e.dot(e)
+        
+        # Regression sum of squares
+        y_hat_centered = y_hat - np.mean(y_hat)
+        SSR = y_hat_centered.dot(y_hat_centered)
+
+        # Total sum of squares
+        y_centered = y - np.mean(y)
+        SST = y_centered.dot(y_centered)
+
+        # OLS estimate for sigma^2 and sigma
+        s_sq = SSE / (n - K)
+        s = np.sqrt(s_sq)
+
+        # Sampling error (only b/c we know true beta values)
+        sampling_error = b_ols - beta
+
+        # Conditional variance and standard errors of beta
+        var_b = s_sq * np.linalg.inv(X.T.dot(X))
+        SE_b = np.sqrt(np.diag(var_b))
         """
         st.code(ols_code_err, language="python")
 
     with f2_c3:
         ols_code_err_b = """
         import statsmodels.api as sm
-        # TBD
+        model = sm.OLS(y, X).fit()
 
+        # Sum of squared errors
+        SSE = model.ssr # this is SSE according to Greene
+
+        # Regression sum of squares
+        SSR = model.ess
+        
+        # Total sum of squares
+        SST = SSE + SSR
+        
+        # OLS estimate for sigma^2 and sigma
+        s_sq = model.mse_resid
+        s = model.mse_resid ** 0.5
+        
+        # Sampling error (only b/c we know true beta values)
+        sampling_error = model.params - beta
+        
+        # Conditional variance and standard errors of beta
+        var_b = model.cov_params()
+        SE_b = model.bse
         """
 
         st.code(ols_code_err_b, language="python")
@@ -506,9 +546,9 @@ with c04:
     with f3_c1:
         st.markdown(
             r"""            
-            $R^2 = \frac{SSR}{SST} = \frac{SSR}{SSR + SSE} = 1 - \frac{SRR}{SSE}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
+            $R^2 = \frac{SSR}{SST} = \frac{SST - SSE}{SST} = 1 - \frac{SSE}{SST}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
             <br>
-            $R_{adj}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$""",
+            $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$""",
             unsafe_allow_html=True,
         )
 
@@ -527,12 +567,13 @@ with c04:
     with f3_c3:
         r2_code_built_in = """
         import statsmodels.api as sm
-        model = sm.OLS(y, x).fit()
+        model = sm.OLS(y, X).fit()
         r_sq = model.rsquared
         r_sq_adj = model.rsquared_adj
         """
 
         st.code(r2_code_built_in, language="python")
+
     st.divider()
 
 s0, c05, s1 = utl.wide_col()
@@ -542,7 +583,7 @@ with c05:
 
     with st.expander("SST = SSR + SSE"):
         st.markdown(
-            rf"Proof from Greene (also see [Stack Exchange]({sst_proof})):<br>"
+            rf"Proof from Greene Section 3.5 (also see [Stack Exchange]({sst_proof})):<br>"
             + r"""
                 $y_i - \bar{y} = \mathbf{x}_i'\mathbf{b} + e_i$<br>
                 $y_i - \bar{y} = \hat{y}_i - \bar{y} + e_i = (\mathbf{x}_i - \mathbf{\bar{x}})'\mathbf{b} + e_i$<br>
@@ -550,5 +591,21 @@ with c05:
                 $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e} = SSR + SSE$<br>
                 (need to expand between last two steps, but main trick is that $\mathbf{e'M^0X = e'X=0}$)<br>
                 """,
+            unsafe_allow_html=True,
+        )
+
+    with st.expander("Transformed Variables"):
+        st.markdown(
+            r"""
+            Proof from Greene THEOREM 3.8:<br>
+            Let $\mathbf{b}$ be the OLS coefficients from regressing $\mathbf{y}$ on $\mathbf{X}$.<br>
+            Regress $\mathbf{y}$ on transformed variables $\mathbf{Z = XP}$, where $\mathbf{P}$ transforms columns of $\mathbf{X}$.<br>
+            Then OLS coefficients are:<br>
+            $\mathbf{d = (Z'Z)^{-1}Z'y = [(XP)'(XP)]^{-1}(XP)'y = [P'X'XP]^{-1}P'X'y =}$<br>
+            $\mathbf{= P^{-1}(X'X)^{-1}P'^{-1}P'X'y = P^{-1}(X'X)^{-1}X'y = P^{-1}b}$<br>
+            The vector of residuals is:<br>
+            $\mathbf{u = y - Z(P^{-1}b) = y - XP(P^{-1}b) = y - Xb = e}$<br>
+            Since residuals are identical and $\mathbf{y'M^0y}$ is unchanged, $R^2$ is also identical in two regressions.
+            """,
             unsafe_allow_html=True,
         )
