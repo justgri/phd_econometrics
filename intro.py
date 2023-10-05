@@ -141,7 +141,7 @@ with c2:
         Experience has shown that each of these three view-points, that of statistics, economic theory, and mathematics, is a necessary, but not by itself a sufficient,
         condition for a real understanding of the quan- titative relations in modern economic life.
         **It is the unification of all three that is powerful.
-        And it is this *unification* that constitutes econometrics.**"
+        And it is this *unification* that constitutes econometrics.**" (emphasis added)
         """,
         unsafe_allow_html=True,
     )
@@ -159,7 +159,7 @@ with c2:
         unsafe_allow_html=True,
     )
 
-    with st.expander("Click to expand", expanded=False):
+    with st.expander("Click to expand", expanded=True):
         st.write(
             "Chapters follow Hayahshi *Econometrics* (1st ed.). Chapters from Greene *Eceonometric Analysis* (8th ed.) given in the parentheses."
         )
@@ -175,10 +175,11 @@ with c2:
         
     <div class="numbered">
         1. OLS algebra (Greene Ch 2 - 3.2) <br>
-        2. FWL and Goodness of fit measures (Greene Ch 3.3 - 4) <br>
-        3. Hypothesis testing (Greene Ch 5) <br>
-        4. Omitted Variable Bias (Greene Ch 4)<br>
-        
+        2. Hypothesis testing (Greene Ch 5) <br>
+        3. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
+        3. Model selection (Greene Ch 3.5 and Ch 5.8) <br>
+        5. Functional form (Greene 6.5)
+        6. PCA (Greene Ch 4.9)
     </div>
 
     <br>
@@ -200,7 +201,7 @@ with c2:
     </div>
 
     <div class="numbered">
-        8. Endogeneity bias <br>
+        8. Endogeneity <br>
         9. Instrumental Variables <br>
         10. IV-related tests <br>
         11. GMM properties
