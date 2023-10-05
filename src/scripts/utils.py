@@ -13,11 +13,15 @@ def external_css(file_url):
 
 
 def wide_col():
-    return st.columns((0.2, 1, 0.2))
+    return st.columns((0.02, 1, 0.02))
 
 
 def narrow_col():
     return st.columns((0.35, 1, 0.35))
+
+
+def narrow_col_intro():
+    return st.columns((0.1, 1, 0.1))
 
 
 def two_cols():

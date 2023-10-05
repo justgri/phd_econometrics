@@ -4,13 +4,14 @@ import sys
 
 import numpy as np
 import pandas as pd
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
+
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -44,7 +45,9 @@ with c01:
     st.title("Ordinary Least Squares Estimation")
     st.header("1. Visualizing OLS estimates")
 
-    st.write("Play around with sliders to see how the data and estimates change.")
+    st.write(
+        "Play around with sliders to see how the data and estimates change."
+    )
     st.write(
         r"Suppose you have the following true population relationship between $X$ and $y$, with parameters defined by slider values."
     )
@@ -247,13 +250,17 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
+        custom_data = gen_lin_data(
+            b0_cust, b1_cust, var_cust, n_cust, random_seed
+        )
 
 
 coefficients = create_summary(custom_data)
 
 with chart_col:
-    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
+    chart_col.pyplot(
+        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
+    )
 
 
 # CSS styles for the table (center and header)
@@ -456,7 +463,8 @@ with c04:
         st.markdown(
             r"""
             Error Sum of Squares (SSE) aka Sum of Squared Residuals (SSR or RSS, hence confusion):<br>
-            $SSE = \sum_{i=1}^n (y_i-\hat{y_i})^2 = \sum_{i=1}^n (e_i)^2 =  \mathbf{e'e = \varepsilon' M \varepsilon}$ (this is SSR according to Hayashi)<br>
+            $SSE = \sum_{i=1}^n (y_i-\hat{y_i})^2 = \sum_{i=1}^n (e_i)^2 =  \mathbf{e'e = \varepsilon' M \varepsilon}$<br>
+            (this is SSR according to Hayashi)<br>
 
             Regression sum of squares (SSR) aka Explained Sum of Squares (ESS):<br>
             $SSR = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{\hat{y}})^2$<br>
@@ -466,7 +474,7 @@ with c04:
             $SST = \sum_{i=1}^n (y_i-\bar{y_i})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 + \sum_{i=1}^n (e_i)^2$ <br>
             $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e = SSR + SSE}$<br>
             
-            OLS estimate of $\sigma^2$ aka Standard Error of the Regression (SER):<br>
+            OLS estimate for $\sigma^2$ aka Standard Error of the Regression (SER):<br>
             $s^2 \equiv \frac{SSE}{n-K} = \frac{\mathbf{e'e}}{n-K}$<br>
             $SER = \sqrt{s^2} = s$ (think of MSE)<br>
         
@@ -543,7 +551,7 @@ with c04:
     st.markdown(
         r"""
         "Choosing a model based on the lowest AIC is logically the same as using $\bar{R}^2$ in the linear model, nonstatistical, albeit widely accepted.
-        The AIC and BIC are information criteria, not fit measures as such."(Greene, p.561)<br>
+        The AIC and BIC are information criteria, not fit measures as such." (Greene, p.561)<br>
         APC has a direct relationship to $R^2$.<br>
         NB: $R^2$ definition below requires a constant term to be included in the model.<br>
         """,
@@ -659,8 +667,8 @@ with c05:
             Let $\mathbf{b}$ be the OLS coefficients from regressing $\mathbf{y}$ on $\mathbf{X}$.<br>
             Regress $\mathbf{y}$ on transformed variables $\mathbf{Z = XP}$, where $\mathbf{P}$ transforms columns of $\mathbf{X}$.<br>
             Then OLS coefficients are:<br>
-            $\mathbf{d = (Z'Z)^{-1}Z'y = [(XP)'(XP)]^{-1}(XP)'y = [P'X'XP]^{-1}P'X'y =}$<br>
-            $\mathbf{= P^{-1}(X'X)^{-1}P'^{-1}P'X'y = P^{-1}(X'X)^{-1}X'y = P^{-1}b}$<br>
+            $\mathbf{d = (Z'Z)^{-1}Z'y = [(XP)'(XP)]^{-1}(XP)'y}$ $\mathbf{= [P'X'XP]^{-1}P'X'y =}$
+            $\mathbf{P^{-1}(X'X)^{-1}P'^{-1}P'X'y}$ $\mathbf{= P^{-1}(X'X)^{-1}X'y = P^{-1}b}$<br>
             The vector of residuals is:<br>
             $\mathbf{u = y - Z(P^{-1}b) = y - XP(P^{-1}b) = y - Xb = e}$<br>
             Since residuals are identical and $\mathbf{y'M^0y}$ is unchanged, $R^2$ is also identical in two regressions.
@@ -668,7 +676,9 @@ with c05:
             unsafe_allow_html=True,
         )
 
-    with st.expander("Relating two formulations of AIC (Greene pp. 47 and 561)"):
+    with st.expander(
+        "Relating two formulations of AIC (Greene pp. 47 and 561)"
+    ):
         st.markdown(
             r"""
             Not sure if this is useful, but it clarified things in my head.<br>
