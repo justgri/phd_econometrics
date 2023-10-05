@@ -541,10 +541,11 @@ with c04:
 
     st.markdown("#### Model fit and selection measures")
     st.markdown(
-        r"""NB: $R^2$ definition below requires a constant term to be included in the model, i.e. $\mathbf{X}$ contains a column of 1s.<br>
-        "Choosing a model based on the lowest AIC is logicall the same as using $\bar{R}^2$ in the linear model, nonstatistical, albeit widely accepted.
+        r"""
+        "Choosing a model based on the lowest AIC is logically the same as using $\bar{R}^2$ in the linear model, nonstatistical, albeit widely accepted.
         The AIC and BIC are information criteria, not fit measures as such."(Greene, p.561)<br>
-        APC has a direct relationship to $R^2$.
+        APC has a direct relationship to $R^2$.<br>
+        NB: $R^2$ definition below requires a constant term to be included in the model.<br>
         """,
         unsafe_allow_html=True,
     )
