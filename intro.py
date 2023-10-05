@@ -1,5 +1,5 @@
 import streamlit as st
-from st_pages import Page, add_page_title, show_pages, show_pages_from_config
+from st_pages import Page, add_page_title, show_pages_from_config
 
 import src.scripts.plot_themes
 import src.scripts.utils as utl
@@ -14,7 +14,8 @@ utl.local_css("src/styles/styles_home.css")
 utl.external_css(
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
 )
-# show_pages_from_config()
+
+show_pages_from_config()
 
 s1, c1, c2 = utl.wide_col()
 
