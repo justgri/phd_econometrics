@@ -178,7 +178,7 @@ with c2:
         2. Hypothesis testing (Greene Ch 5) <br>
         3. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
         3. Model selection (Greene Ch 3.5 and Ch 5.8) <br>
-        5. Functional form (Greene 6.5)
+        5. Functional form (Greene Ch 6.5)
         6. PCA (Greene Ch 4.9)
     </div>
 
