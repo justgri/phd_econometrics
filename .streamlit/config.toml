@@ -1,22 +1,24 @@
 [theme]
+primaryColor="#05537f"
+backgroundColor="#fafafa"
+secondaryBackgroundColor="#c5deef"
+textColor="#000000"
 
+# Font family for all text in the app, except code blocks. One of "sans serif", "serif", or "monospace".
+font = "sans serif"
+
+# Remember what the colors mean
 # The preset Streamlit theme that your custom theme inherits from. One of "light" or "dark".
-base = "light" 
+# base = "light" 
 
 # Primary accent color for interactive elements.
-primaryColor = "blue"
+# primaryColor = "blue"
 
 # Background color for the main content area.
 # backgroundColor = "rgb(240, 252, 246)"
-# backgroundColor = "rgb(235, 255, 250)"
-
-
 
 # Background color used for the sidebar and most interactive widgets.
 # secondaryBackgroundColor = "blue"
 
 # Color used for almost all text.
-textColor = "black"
-
-# Font family for all text in the app, except code blocks. One of "sans serif", "serif", or "monospace".
-font = "sans serif"
+# textColor = "black"

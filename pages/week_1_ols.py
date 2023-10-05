@@ -46,10 +46,10 @@ with c01:
 
     st.write("Play around with sliders to see how the data and estimates change.")
     st.write(
-        r"Suppose you have the following true population relationship between $X$ and $Y$, with parameters defined by slider values."
+        r"Suppose you have the following true population relationship between $X$ and $y$, with parameters defined by slider values."
     )
     st.write(
-        r"You then draw a sample of size $n$ from that population and estimate OLS coefficients, $\hat{\beta_0}$ and $\hat{\beta_1}$."
+        r"You then draw a sample of size $n$ from that population and estimate OLS coefficients, $b_0$ and $b_1$."
     )
 
 
@@ -107,10 +107,10 @@ def gen_lin_data(b0, b1, sd, N, rseed):
 with c01:
     st.latex(
         r"""
-            Y_i = \beta_0 + \beta_1X_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
+            y_i = \beta_0 + \beta_1x_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
         """
     )
-    st.latex(r"""\hat{Y_i} = """ + r"""\hat{\beta_0} + \hat{\beta_1}X""")
+    st.latex(r"""\hat{y_i} = """ + r"""b_0 + b_1 x_i""")
 
 
 slider_col, s1, chart_col = st.columns((0.8, 0.1, 1))
@@ -219,13 +219,13 @@ def plot_ols(data_custom, b0, b1):
 def create_summary(data):
     coefficients = pd.DataFrame(
         {
-            "Coefficient": [r"Intercept b_0", "Slope b_1"],
-            "Population": [b0_cust, b1_cust],
-            "Sample": [
+            "Coefficient": [r"Intercept", "Slope"],
+            "Population Parameters": [b0_cust, b1_cust],
+            "Sample Estimates": [
                 data["model"].params[0],
                 data["model"].params[1],
             ],
-            "Sample SE": [
+            "Standard Errors": [
                 data["model"].bse[0],
                 data["model"].bse[1],
             ],
@@ -233,9 +233,13 @@ def create_summary(data):
     )
 
     # Apply formatting to the "True Pop" and "Estimate" columns
-    coefficients[["Population", "Sample", "Sample SE"]] = coefficients[
-        ["Population", "Sample", "Sample SE"]
-    ].applymap(lambda x: f"{x:.2f}")
+    coefficients[
+        ["Population Parameters", "Sample Estimates", "Standard Errors"]
+    ] = coefficients[
+        ["Population Parameters", "Sample Estimates", "Standard Errors"]
+    ].applymap(
+        lambda x: f"{x:.2f}"
+    )
 
     return coefficients
 
@@ -320,9 +324,9 @@ with c03:
     st.markdown(
         r"""
                     
-    2. Variance of $\hat{\beta}$ (and thus their standard errors) does not depend on population $\beta$. <br>
-    It depends on variance of errors $s^2$ (and thus $\sigma^2)$, $N-k$. and $X'X$.<br>
-    Note that higher variance of $X$ leads to a lower variance of $\hat{\beta}$, which is intuitive because you cover a wider range of $X$s.<br>
+    2. Variance of $\mathbf{b}$ (and thus their standard errors) does not depend on population $\beta$. <br>
+    It depends on variance of errors $s^2$ (and thus $\sigma^2)$, $N-k$, and $X'X$.<br>
+    Note that higher variance of $X$ leads to a lower variance of $\mathbf{b}$, which is intuitive because you cover a wider range of $X$s.<br>
     
         $\widehat{var(\mathbf{b}| \mathbf{X})} \equiv s^2 (X'X)^{-1} = \frac{\mathbf{e'e}}{n - K} (X'X)^{-1}$
 """,
@@ -558,18 +562,18 @@ with c04:
             $R^2$, $\bar{R}^2$ (adjusted), and Pseudo $R^2$:<br>
             $R^2 = \frac{SSR}{SST} = \frac{SST - SSE}{SST} = 1 - \frac{SSE}{SST}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
             $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$<br>
-            $Pseudo \; R^2 = 1 - \frac{\text{ln} L}{\text{ln} L_0} = \frac{-\text{ln}(1-R^2)}{1+\text{ln}(2\pi) + \text{ln}(s_y^2)}$<br>
+            McFadden Pseudo  $R^2 = 1 - \frac{\text{ln} L}{\text{ln} L_0} = \frac{-\text{ln}(1-R^2)}{1+\text{ln}(2\pi) + \text{ln}(s_y^2)}$<br>
             
             Amemiya's Prediction Criterion (APC):<br>
             $APC=\frac{SSE}{n-K}(1+\frac{K}{n}) = SSE \frac{n+K}{n-K}$<br>
 
             AIC and BIC for OLS, when error variance is known (Greene p. 47):<br>
             $AIC = \text{ln}(\frac{SSE}{n}) + \frac{2K}{n}$<br>
-            $BIC = \text{ln}(\frac{SSE}{n}) + \frac{K \text{ln}(n)}{n}$<br>
+            $BIC = \text{ln}(\frac{SSE}{n}) + \frac{\text{ln}(n) K}{n}$<br>
             
             AIC and BIC are calculated as below for any MLE (Greene p. 561):<br>
-            $AIC = -2 \text{ln}(L)+2k$<br>
-            $BIC = -2 \text{ln}(L) + \text{ln} (n) k  $<br>
+            $AIC = -2 \text{ln}(L)+2K$<br>
+            $BIC = -2 \text{ln}(L) + \text{ln}(n) K  $<br>
             
             In OLS, SSE is proportional to log-likelihood, so the two formulas would lead to the same model selection.<br>
             NB: statsmodels, STATA, and R lm() use the latter definition, whereas SAS uses the former multiplied by $n$.

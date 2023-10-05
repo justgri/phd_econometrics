@@ -26,7 +26,6 @@ email_url = "mailto:justinas.grigaitis@econ.uzh.ch"
 # Intro
 with c1:
     st.title("Econometrics for PhD Students")
-    st.sidebar.success("Select a page above.")
 
     st.markdown(
         "Trying to learn and enjoy the first year of Econ PhD. <br> Procrastinating productively. <br> All mistakes are my own.",
