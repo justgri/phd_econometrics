@@ -439,7 +439,7 @@ with c04:
 
     ### OLS Additional Concepts
     st.markdown(
-        "#### World of Errors",
+        "#### OLS Errors",
         unsafe_allow_html=True,
     )
     st.markdown(
@@ -535,41 +535,94 @@ with c04:
 
     st.divider()
 
-    st.markdown("#### $R^2$ centered and $R^2$ adjusted")
+    st.markdown("#### Model fit and selection measures")
     st.markdown(
-        r"""NB: this requires a constant term to be included in the model, i.e. $\mathbf{X}$ contains a column of 1s.""",
+        r"""NB: $R^2$ definition below requires a constant term to be included in the model, i.e. $\mathbf{X}$ contains a column of 1s.<br>
+        "Choosing a model based on the lowest AIC is logicall the same as using $\bar{R}^2$ in the linear model, nonstatistical, albeit widely accepted.
+        The AIC and BIC are information criteria, not fit measures as such."(Greene, p.561)<br>
+        APC has a direct relationship to $R^2$.
+        """,
         unsafe_allow_html=True,
     )
 
     f3_c1, f3_c2, f3_c3 = tabs_code_theory()
 
+    # Sources for AIC and BIC
+    sas_source = "https://documentation.sas.com/doc/en/vfcdc/8.5/vfug/p0uawamu7dmtc2n1cllfwajyvlko.htm"
+    stata_source = "https://www.stata.com/manuals13/restatic.pdf"
+    stack_ex = "https://stats.stackexchange.com/questions/490056/aic-bic-formula-wrong-in-james-witten"
+
     with f3_c1:
         st.markdown(
-            r"""            
+            r"""          
+            $R^2$, $\bar{R}^2$ (adjusted), and Pseudo $R^2$:<br>
             $R^2 = \frac{SSR}{SST} = \frac{SST - SSE}{SST} = 1 - \frac{SSE}{SST}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
-            <br>
-            $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$""",
+            $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$<br>
+            $Pseudo \; R^2 = 1 - \frac{\text{ln} L}{\text{ln} L_0} = \frac{-\text{ln}(1-R^2)}{1+\text{ln}(2\pi) + \text{ln}(s_y^2)}$<br>
+            
+            Amemiya's Prediction Criterion (APC):<br>
+            $APC=\frac{SSE}{n-K}(1+\frac{K}{n}) = SSE \frac{n+K}{n-K}$<br>
+
+            AIC and BIC for OLS, when error variance is known (Greene p. 47):<br>
+            $AIC = \text{ln}(\frac{SSE}{n}) + \frac{2K}{n}$<br>
+            $BIC = \text{ln}(\frac{SSE}{n}) + \frac{K \text{ln}(n)}{n}$<br>
+            
+            AIC and BIC are calculated as below for any MLE (Greene p. 561):<br>
+            $AIC = -2 \text{ln}(L)+2k$<br>
+            $BIC = -2 \text{ln}(L) + \text{ln} (n) k  $<br>
+            
+            In OLS, SSE is proportional to log-likelihood, so the two formulas would lead to the same model selection.<br>
+            NB: statsmodels, STATA, and R lm() use the latter definition, whereas SAS uses the former multiplied by $n$.
+            """,
             unsafe_allow_html=True,
         )
 
     with f3_c2:
         r2_code = """
         import numpy as np
-        e_dot_e = e.dot(e)
-        y_bar = np.mean(y)
-        y_centered = y - y_bar
-        y_M0_y = y_centered.dot(y_centered)
-        r_sq = 1 - e_dot_e / y_M0_y
+        # R-sq and R-sq adjusted
+        y_centered = y - np.mean(y)
+        r_sq = 1 - e.dot(e) / y_centered.dot(y_centered)
         r_sq_adj = 1 - ((n - 1) / (n - K)) * (1 - r_sq)
+
+        # Pseudo R-sq
+        var_y = np.var(y)
+        pseudo_r_sq = (-1 * np.log(1 - r_sq) / (1 + np.log(2 * np.pi) + np.log(var_y)))
+                
+        # Amemiya's Prediction Criterion
+        APC = (e.dot(e) / n) * (n + K) / (n - K)
+
+        # AIC and BIC, first get log likelihood
+        ln_L = (-n / 2) * (1 + np.log(2 * np.pi) + np.log(SSE / n))
+        AIC = -2 * ln_L + 2 * K
+        BIC = -2 * ln_L + K * np.log(n)
         """
         st.code(r2_code, language="python")
 
     with f3_c3:
         r2_code_built_in = """
         import statsmodels.api as sm
+        import numpy as np
+
         model = sm.OLS(y, X).fit()
+
+        # R-sq and R-sq adjusted
         r_sq = model.rsquared
         r_sq_adj = model.rsquared_adj
+
+        # Pseudo R-sq
+        ln_L = model.llf
+        model_constant = sm.OLS(y, np.ones(n)).fit()
+        ln_L_0 = model_constant.llf
+        pseudo_r_sq = 1 - ln_L / ln_L_0
+
+        # Amemiya's Prediction Criterion - no built-in module
+        APC = (e.dot(e) / n) * (n + K) / (n - K)
+
+        # AIC and BIC
+        AIC = model.aic
+        BIC = model.bic
+
         """
 
         st.code(r2_code_built_in, language="python")
@@ -607,5 +660,24 @@ with c05:
             $\mathbf{u = y - Z(P^{-1}b) = y - XP(P^{-1}b) = y - Xb = e}$<br>
             Since residuals are identical and $\mathbf{y'M^0y}$ is unchanged, $R^2$ is also identical in two regressions.
             """,
+            unsafe_allow_html=True,
+        )
+
+    with st.expander("Relating two formulations of AIC (Greene pp. 47 and 561)"):
+        st.markdown(
+            r"""
+            Not sure if this is useful, but it clarified things in my head.<br>
+            
+            Recall, $SSE = \mathbf{e'e}$<br>
+            In the linear model with normally distributed disturbances, the maximized log likelihood is<br>
+            $\text{ln} L = -\frac{n}{2} [1 + \text{ln}(2 \pi) + \text{ln}(\frac{SSE}{n})]$<br>
+            Ignore the constants and notice that<br>
+            $\text{ln} L \propto -\frac{n}{2} \text{ln}(\frac{SSE}{n})$<br>
+            $-2 \text{ln} L \propto n \text{ln}(\frac{SSE}{n})$<br>
+            $-2 \text{ln} L + 2K \propto n \text{ln}(\frac{SSE}{n}) + 2K$<br>
+            $-2 \text{ln} L + 2K \propto \text{ln}(\frac{SSE}{n}) + \frac{2K}{n}$<br>
+            Which we wanted to show.<br>
+            Might have been enough to just state that $\text{ln} L \propto -\text{ln}(\frac{SSE}{n})$.
+""",
             unsafe_allow_html=True,
         )

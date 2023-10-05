@@ -41,3 +41,8 @@ html {
     margin: 0 auto;
     text-align: center;
 }
+
+/* Latex increase margins - doesn't work */
+span.math.math-inline span.katex span.katex-mathml {
+    margin: 20px !important;
+}

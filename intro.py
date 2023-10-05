@@ -100,6 +100,12 @@ with c2:
     )
 
     st.link_button(
+        "An Introduction to Statistical Learning with R/Python (free textbooks)",
+        "https://www.statlearning.com/",
+        type="secondary",
+    )
+
+    st.link_button(
         "TA notes by Matteo Courthoud",
         "https://matteocourthoud.github.io/course/metrics/",
         type="secondary",
