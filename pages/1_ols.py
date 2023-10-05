@@ -447,7 +447,7 @@ with c04:
         unsafe_allow_html=True,
     )
     st.markdown(
-        """NB: Hayashi and Greene classically disagree on what SSR means, so I'll follow Greene.""",
+        """NB: Hayashi and Greene classically disagree on notation for the sum of squared residuals (SSE or SSR), so I'll follow Greene.""",
         unsafe_allow_html=True,
     )
 
