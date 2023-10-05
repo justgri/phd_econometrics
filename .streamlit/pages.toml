@@ -4,6 +4,6 @@ name = "Introduction"
 icon = "🏠"
 
 [[pages]]
-path = "pages/week_1_ols.py"
-name = "1. OLS"
+path = "pages/1_ols.py"
+name = "1. OLS Estimation"
 icon = "📖"
