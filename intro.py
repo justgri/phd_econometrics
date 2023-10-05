@@ -311,12 +311,25 @@ with c2:
          Then $x' B^{-1} \geq x'A^{-1}$ and then $x' (B^{-1} - A^{-1})x \geq 0$<br>
          "<=" direction: replace $A$ with $B^{-1}$ and $B$ with $A^{-1}$ and repeat the same steps<br>
 
-
         Bonus (not Wooldridge) : <br>
 
-        11. **Concepts of Independence**
+        11. **Concepts of Independence**<br>
+        Independence: $ P(X \cap Y) = P(X)P(Y) $ or $ P(X = x, Y = y) = P(X = x)P(Y = y) \; \forall x, y$. <br>
+        Mean Independence: $ E(X | Y = y) = E(X) \; \forall y$.<br>
+        Orthogonality: $\langle X, Y \rangle  = E[XY]=0$, but $\langle X, Y \rangle$ often defined as $Cov(X,Y)$, then
+        $\langle X, Y \rangle = Cov(X,Y) = E[(X - E(X))(Y - E(Y))] = 0 $<br>
+        Conditional Independence: $ P(X = x, Y = y | Z = z) = P(X = x | Z = z)P(Y = y | Z = z) \; \forall x, y, z$.<br>
+        Linear Independence (in linear algebra):<br>
+        Vectors $ \mathbf{v_1}, \mathbf{v_2}, ... \mathbf{v_n} $ are linearly independent if and only if no vector is zero and no vector can be expressed as a linear combination of the others.<br>
 
-        12. **Concepts of Convergence**
+        12. **Concepts of Convergence**<br>
+        Let $X$ be a random variable and $X_n$ a sequence of random variables.<br>
+        i. Convergence in probability $X_n \xrightarrow{P} X$ if $ \lim_{n \to \infty} P(|X_n - X| > \epsilon) = 0 \; \forall \epsilon > 0$ <br>
+        ii. Convergence almost surely: $X_n \xrightarrow{a.s.} X$ if $P(\lim_{n \to \infty} X_n = X) = 1$ <br>
+        iii. Convergence in distribution: $X_n \xrightarrow{d} X$ if $\lim_{n \to \infty} F_{X_n}(x) = F_X(x) \; \forall x \in \mathbb{R}$ at which $F_X$ is continuous.<br>
+        $ i. \implies ii. \implies iii.$
+        
+
         """,
             unsafe_allow_html=True,
         )
