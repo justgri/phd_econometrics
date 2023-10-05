@@ -1,8 +1,8 @@
 numpy
 pandas
 plotly
-streamlit>=1.25.0
+streamlit>=1.27.0
 matplotlib
 scikit-learn
-st_pages>=0.4.3
+st_pages>=0.4.5
 statsmodels

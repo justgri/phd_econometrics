@@ -560,7 +560,7 @@ with c04:
     with f3_c1:
         st.markdown(
             r"""          
-            $R-sq, Adjusted R-sq, and Pseudo R-sq:<br>
+            R-sq, Adjusted R-sq, and Pseudo R-sq:<br>
             $R^2 = \frac{SSR}{SST} = \frac{SST - SSE}{SST} = 1 - \frac{SSE}{SST}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
             $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$<br>
             McFadden Pseudo  $R^2 = 1 - \frac{\text{ln} L}{\text{ln} L_0} = \frac{-\text{ln}(1-R^2)}{1+\text{ln}(2\pi) + \text{ln}(s_y^2)}$<br>
