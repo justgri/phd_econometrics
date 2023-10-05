@@ -1,9 +1,0 @@
-[[pages]]
-path = "intro.py"
-name = "Introduction"
-icon = "🏠"
-
-[[pages]]
-path = "pages/1_ols.py"
-name = "1. OLS Estimation"
-icon = "📖"

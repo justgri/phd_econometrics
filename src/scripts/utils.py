@@ -7,9 +7,7 @@ def local_css(file_path):
 
 
 def external_css(file_url):
-    st.markdown(
-        f'<link href="{file_url}" rel="stylesheet">', unsafe_allow_html=True
-    )
+    st.markdown(f'<link href="{file_url}" rel="stylesheet">', unsafe_allow_html=True)
 
 
 def wide_col():
