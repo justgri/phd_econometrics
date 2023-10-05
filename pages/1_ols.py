@@ -379,13 +379,13 @@ with c04:
             $\mathbf{y = X \beta + \varepsilon}$<br>
             <br>
             Let $\mathbf{e \equiv y - Xb}$ and solve for $\mathbf{b}$ that minimizes $\mathbf{e'e}$<br>
-            $\mathbf{b = (X'X)^{-1}X'y}$ is then the OLS estimate $\beta$<br>
+            $\mathbf{b = (X'X)^{-1}X'y}$ solution is the OLS estimate for $\beta$<br>
             $\mathbf{\hat{y} = X b}$ <br>
             <br>
-            $\mathbf{P_{n \times n} \equiv X(X'X)^{-1}X'}$ is the projection or hat matrix<br>
+            $\mathbf{P_{n \times n} \equiv X(X'X)^{-1}X'}$ is the "projection" or "hat" matrix<br>
             $\mathbf{PX = P}$ and $\mathbf{Py = \hat{y}}$<br>
             <br>
-            $\mathbf{M_{n \times n} \equiv I_n - P}$ is the annihilator or residual maker matrix<br>
+            $\mathbf{M_{n \times n} \equiv I_n - P}$ is the "annihilator" or "residual maker" matrix<br>
             $\mathbf{MX = 0}$ and $\mathbf{My = e}$<br>
             
 
@@ -447,7 +447,7 @@ with c04:
         unsafe_allow_html=True,
     )
     st.markdown(
-        """NB: this got me confused for a minute because Hayashi and Greene classically disagree on what SSR means, so I'll follow Greene.""",
+        """NB: Hayashi and Greene classically disagree on what SSR means, so I'll follow Greene.""",
         unsafe_allow_html=True,
     )
 
@@ -559,7 +559,7 @@ with c04:
     with f3_c1:
         st.markdown(
             r"""          
-            $R^2$, $\bar{R}^2$ (adjusted), and Pseudo $R^2$:<br>
+            $R-sq, Adjusted R-sq, and Pseudo R-sq:<br>
             $R^2 = \frac{SSR}{SST} = \frac{SST - SSE}{SST} = 1 - \frac{SSE}{SST}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
             $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$<br>
             McFadden Pseudo  $R^2 = 1 - \frac{\text{ln} L}{\text{ln} L_0} = \frac{-\text{ln}(1-R^2)}{1+\text{ln}(2\pi) + \text{ln}(s_y^2)}$<br>
@@ -571,12 +571,12 @@ with c04:
             $AIC = \text{ln}(\frac{SSE}{n}) + \frac{2K}{n}$<br>
             $BIC = \text{ln}(\frac{SSE}{n}) + \frac{\text{ln}(n) K}{n}$<br>
             
-            AIC and BIC are calculated as below for any MLE (Greene p. 561):<br>
+            AIC and BIC are more often calculated for any MLE as follows (Greene p. 561):<br>
             $AIC = -2 \text{ln}(L)+2K$<br>
             $BIC = -2 \text{ln}(L) + \text{ln}(n) K  $<br>
             
             In OLS, SSE is proportional to log-likelihood, so the two formulas would lead to the same model selection.<br>
-            NB: statsmodels, STATA, and R lm() use the latter definition, whereas SAS uses the former multiplied by $n$.
+            NB: Even for OLS, Python *statsmodels*, STATA *estat ic*, and R *lm* use the latter definition, whereas SAS uses the former multiplied by $n$.
             """,
             unsafe_allow_html=True,
         )
