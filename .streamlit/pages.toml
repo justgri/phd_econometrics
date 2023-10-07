@@ -12,8 +12,3 @@ icon = "🛠"
 path = "pages/1_ols.py"
 name = "OLS Estimation"
 icon = "📈"
-
-[[pages]]
-path = "pages/2_fit.py"
-name = "Fit Measures"
-icon = "🎯"
