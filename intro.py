@@ -178,7 +178,7 @@ with c2:
         2. Hypothesis testing (Greene Ch 5) <br>
         3. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
         3. Model selection (Greene Ch 3.5 and Ch 5.8) <br>
-        5. Functional form (Greene Ch 6.5)
+        5. Functional form (Greene Ch 6.5)<br>
         6. PCA (Greene Ch 4.9)
     </div>
 
@@ -223,114 +223,5 @@ with c2:
     Next semester - Panel Data, Time Series, Cointegration, and MLE. <br>
     Bonus if time permits (it never does) - Monte Carlo, bootstrapping, gradient descent, causal ML, etc.
     """,
-            unsafe_allow_html=True,
-        )
-
-# Wooldridge Top 10
-with c2:
-    st.markdown(
-        "<h3 style='text-align: center'>10 Tools for Econometrics by Jeffrey Wooldridge</h3>",
-        unsafe_allow_html=True,
-    )
-
-    jmw_source = "https://docs.google.com/document/d/1GQ3qlD0_cNQdkh_iT-dBDXwNVIXk27WCZtmQ3Sgxz1o/mobilebasic#id.f68ahvvbxdaj"
-    jmw_twitter = "https://twitter.com/jmwooldridge"
-    tr_source = "https://bookdown.org/ts_robinson1994/10EconometricTheorems/"
-    st.write(
-        f"Source: Jeffrey Wooldridge [@jmwooldridge]({jmw_twitter}), for tweets organized by topic - [link]({jmw_source})."
-    )
-    st.write(
-        f"Thomas Robinson from LSE elaborate on each of them in this nice e-book - [link]({tr_source})."
-    )
-
-    with st.expander("Click to expand", expanded=True):
-        st.markdown(
-            r"""
-        1. **Law of Iterated Expectations, Law of Total Variance** <br>
-        $E[x] = E[E[x|y]]$ <br>
-        $var[Y] = E[var[Y|X]] + var(E[Y|X])$
-
-        2. **Linearity of Expectations, Variance of a Sum** <br>
-        $E[aX+bY+c] = aE[X] + bE[Y] + c$ <br>
-        $var[aX+bY+c] = a^2 var(X) + b^2 var(Y)$ 
-
-        3. **Jensen's Inequality, Chebyshev's Inequality** <br>
-        Jensen:
-        $\varphi(\operatorname{E}[X]) \leq \operatorname{E} \left[\varphi(X)\right]$, where $X$ is a RV and $\varphi$ is convex <br>
-        Chebyshev:
-        $\Pr(|X-\mu|\geq k\sigma) \leq \frac{1}{k^2}$, where $X$ is a RV, $σ^2$ is finite, and $k>0$
-
-        4. **Linear Projection and its Properties** <br>
-        $\mathbf{P} \equiv \mathbf{X}(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'$ and $\mathbf{M} \equiv \mathbf{I}_n - \mathbf{P}$ <br> 
-        $\mathbf{P}\mathbf{X} = \mathbf{X}$ ("projection") and $\mathbf{M}\mathbf{X} = \mathbf{0}$ ("annihilator") <br>
-        Also $\hat{\mathbf{y}} = \mathbf{P}\mathbf{y}$ ("hat") and $\mathbf{e} = \mathbf{M}\mathbf{y}$ ("residual maker") <br>
-
-        5. **Weak Law of Large Numbers, Central Limit Theorem** <br>
-        Weak LLN: $\lim_{n\to\infty}\Pr\!\left(\,|\overline{X}_n-\mu| < \varepsilon\,\right) = 1$, where $\varepsilon > 0$<br>
-        CLT: $\sqrt{n}\left(\bar{X}_n - \mu\right)\ \xrightarrow{d}\ \mathcal{N}\left(0,\sigma^2\right)$
-
-        6. **Slutksy's Theorem, Continuous Convergence Theorem, Asymptotic Equivalence Lemma**<br>
-        Slutsky: If $X_n \xrightarrow{d} X$ and $Y_n \xrightarrow{p} c$ constant, then $X_n + Y_n \xrightarrow{d} X + c$ and $Y_nX_n \xrightarrow{d} cX$<br>
-        CMT: If $X_n \xrightarrow{d} X$ and $g$ continuous, then $g(X_n) \xrightarrow{d} g(X)$ <br>
-        Asymptotic equivalence: $X_n$ and $Y_n$ are asymptotically equivalent if $X_n - Y_n \xrightarrow{p} 0$
-        
-        7. **Big Op, Little op, and the algebra of them** <br>
-        Given $X_n$ is a RV, $a_n$ is constant, $\varepsilon >0$:<br>
-        $X_n = O_p(a_n)$ means $P(|\frac{X_n}{a_n}| > \delta) < \epsilon, \forall n > N$<br>
-        If $X_n = o_p(a_n)$, then $\frac{x_n}{a_n} = o_p(1)$, meaning $\lim_{n\to\infty} (P|\frac{X_n}{a_n}| \geq \epsilon) = 0, \forall\epsilon > 0$
-        or in other words $\frac{X_n}{a_n} \xrightarrow{p} 0$<br>
-        $o_p(a_n)$ implies $O_p(a_n)$ but not vice-versa.
-
-        8. **Delta Method**<br>
-        Start with $X_n \sim N(\mu,\frac{\sigma^2}{n})$ and get $\frac{\sqrt{n}(X_n - \mu)}{\sigma} \sim N(0,1)$ <br>
-        If $g$ is smooth then by Delta Method:<br>
-        $\frac{\sqrt{n}(g(X_n) - g(\mu))}{|g'(\mu)|\sigma} \approx N(0,1)$ 
-        and $g(X_n) \approx N\left(g(\mu), \frac{g'(\mu)^2\sigma^2}{n}\right)$<br>
-        Note the approximation because $g(X_n)$ is an infinite sum.
-
-
-        9. **Frisch-Waugh Partialling Out**<br>
-        "It's the residual variance that matters" <br>
-        Take $\mathbf{y}$ and two sets of regressors $\mathbf{X}_1$ and $\mathbf{X}_2$.
-        FWL theorem claims that $\mathbf{b}_2$ will be equal after estimating in the following two forms:<br>
-        $\mathbf{y} = \mathbf{X}_1 \mathbf{b}_1 + \mathbf{X}_2 \mathbf{b}_2 + \mathbf{e}$,
-                then $\mathbf{b}_2 = (\mathbf{X}_2'\mathbf{X}_2)^{-1}\mathbf{X}_2'\mathbf{y}$ <br>
-        $\mathbf{y}^* = \mathbf{X}^*_2 \mathbf{b}_2 + \mathbf{e}$,
-          then $\mathbf{b}_2 = (\mathbf{X}^{* \prime}_2 \mathbf{X}^{*}_2 )^{-1} \mathbf{X}^{* \prime}_2 \mathbf{y}^*$, 
-                where $\mathbf{X}^*_2 = \mathbf{M}_1 \mathbf{X}_2$ and $\mathbf{y}^* = \mathbf{M}_1 \mathbf{y}$<br>
-        Explanation for notation in the second form:<br>
-         i. Regress $\mathbf{y}$ on $\mathbf{X}_1$ and get the residuals $\mathbf{M}_1 \mathbf{y}$<br>
-         ii. Regress $\mathbf{X}_2$ on $\mathbf{X}_1$ and get the residuals $\mathbf{M}_{1} \mathbf{X}_2$ <br>
-         iii. Regress $\mathbf{M}_1 \mathbf{y}$ (residuals from i.) on $\mathbf{M}_1 \mathbf{X}_2$ (residuals from ii.), which will give $\mathbf{b}_2$ <br>
-  
-    
-        10. **For PD matrices** $\mathbf{A}$ **and** $\mathbf{B}$, $\mathbf{A} - \mathbf{B}$ **is PSD if and only if**
-         $\mathbf{B}^{-1} - \mathbf{A}^{-1}$ **is PSD** <br>
-         Sketch of the proof, "=>" direction:<br>
-         Take arbitrary non-zero vector $x$, then $x' (A-B)x \geq 0$ and $A \geq B$<br>
-         Then "divide" both sides by AB to get $A^{-1}AB^{-1} \geq A^{-1}BB^{-1}$ and then $B^{-1} \geq A^{-1}$ <br>
-         Then $x' B^{-1} \geq x'A^{-1}$ and then $x' (B^{-1} - A^{-1})x \geq 0$<br>
-         "<=" direction: replace $A$ with $B^{-1}$ and $B$ with $A^{-1}$ and repeat the same steps<br>
-
-        Bonus (not Wooldridge) : <br>
-
-        11. **Concepts of Independence**<br>
-        Independence: $ P(X \cap Y) = P(X)P(Y) $ or $ P(X = x, Y = y) = P(X = x)P(Y = y) \; \forall x, y$. <br>
-        Mean Independence: $ E(X | Y = y) = E(X) \; \forall y$.<br>
-        Orthogonality: $\langle X, Y \rangle  = E[XY]=0$, but $\langle X, Y \rangle$ often defined as $Cov(X,Y)$, then
-        $\langle X, Y \rangle = Cov(X,Y) = E[(X - E(X))(Y - E(Y))] = 0 $<br>
-        Conditional Independence: $ P(X = x, Y = y | Z = z) = P(X = x | Z = z)P(Y = y | Z = z) \; \forall x, y, z$.<br>
-        Linear Independence (in linear algebra):<br>
-        Vectors $ \mathbf{v_1}, \mathbf{v_2}, ... \mathbf{v_n} $ are linearly independent if and only if no vector is zero and no vector can be expressed as a linear combination of the others.<br>
-
-        12. **Concepts of Convergence**<br>
-        Let $X$ be a random variable and $X_n$ a sequence of random variables.<br>
-        i. Convergence in probability $X_n \xrightarrow{P} X$ if $ \lim_{n \to \infty} P(|X_n - X| > \epsilon) = 0 \; \forall \epsilon > 0$ <br>
-        ii. Convergence almost surely: $X_n \xrightarrow{a.s.} X$ if $P(\lim_{n \to \infty} X_n = X) = 1$ <br>
-        iii. Convergence in distribution: $X_n \xrightarrow{d} X$ if $\lim_{n \to \infty} F_{X_n}(x) = F_X(x) \; \forall x \in \mathbb{R}$ at which $F_X$ is continuous.<br>
-        $ i. \implies ii. \implies iii.$
-        
-
-        """,
             unsafe_allow_html=True,
         )

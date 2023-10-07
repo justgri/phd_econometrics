@@ -4,6 +4,11 @@ name = "Introduction"
 icon = "🏠"
 
 [[pages]]
+path = "pages/0_tools.py"
+name = "Tools for Econometrics"
+icon = "🛠"
+
+[[pages]]
 path = "pages/1_ols.py"
-name = "1. OLS Estimation"
-icon = "📖"
+name = "OLS Estimation"
+icon = "📈"

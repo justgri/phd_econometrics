@@ -4,14 +4,13 @@ import sys
 
 import numpy as np
 import pandas as pd
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -45,9 +44,7 @@ with c01:
     st.title("Ordinary Least Squares Estimation")
     st.header("1. Visualizing OLS estimates")
 
-    st.write(
-        "Play around with sliders to see how the data and estimates change."
-    )
+    st.write("Play around with sliders to see how the data and estimates change.")
     st.write(
         r"Suppose you have the following true population relationship between $X$ and $y$, with parameters defined by slider values."
     )
@@ -250,17 +247,13 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(
-            b0_cust, b1_cust, var_cust, n_cust, random_seed
-        )
+        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 
 
 coefficients = create_summary(custom_data)
 
 with chart_col:
-    chart_col.pyplot(
-        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
-    )
+    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
 
 
 # CSS styles for the table (center and header)
@@ -317,28 +310,40 @@ s0, c03, s1 = utl.wide_col()
 with c03:
     st.markdown("### Interesting takeaways")
 
-    st.markdown(
-        r"""
-    1. $R^2 = 0$ in expectation if $\beta_1=0$ or if $X_i = \bar{X}$. Also $R^2$ is independent of the intercept.<br>
+    with st.expander("Click to expand."):
+        st.markdown(
+            r"""
+        1. $R^2 = 0$ in expectation if $\beta_1=0$ or if $X_i = \bar{X}$. Also $R^2$ is independent of the intercept.<br>
 
-        $R^2 = \frac{ (\hat{y} - \bar{y})' (\hat{y} - \bar{y}) }{ (y - \bar{y})' (y - \bar{y}) }
-        = \frac{\sum_{i=1}^{N} (\hat{y}_i - \bar{y})^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
-        = \frac{\sum_{i=1}^{N} (\hat{\beta_1} (X_i - \bar{X}))^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}$
-        , because $\hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{X}$
-        """,
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        r"""
-                    
-    2. Variance of $\mathbf{b}$ (and thus their standard errors) does not depend on population $\beta$. <br>
-    It depends on variance of errors $s^2$ (and thus $\sigma^2)$, $N-k$, and $X'X$.<br>
-    Note that higher variance of $X$ leads to a lower variance of $\mathbf{b}$, which is intuitive because you cover a wider range of $X$s.<br>
-    
-        $\widehat{var(\mathbf{b}| \mathbf{X})} \equiv s^2 (X'X)^{-1} = \frac{\mathbf{e'e}}{n - K} (X'X)^{-1}$
-""",
-        unsafe_allow_html=True,
-    )
+            $R^2 = \frac{ (\hat{y} - \bar{y})' (\hat{y} - \bar{y}) }{ (y - \bar{y})' (y - \bar{y}) }
+            = \frac{\sum_{i=1}^{N} (\hat{y}_i - \bar{y})^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
+            = \frac{\sum_{i=1}^{N} (\hat{\beta_1} (X_i - \bar{X}))^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}$
+            , because $\hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{X}$
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            r"""                
+        2. Variance of $\mathbf{b}$ (and thus their standard errors) does not depend on population $\beta$. <br>
+        It depends on variance of errors $s^2$ (and thus $\sigma^2)$, $N-k$, and $X'X$.<br>
+        Note that higher variance of $X$ leads to a lower variance of $\mathbf{b}$, which is intuitive because you cover a wider range of $X$s.<br>
+        
+            $\widehat{var(\mathbf{b}| \mathbf{X})} \equiv s^2 (X'X)^{-1} = \frac{\mathbf{e'e}}{n - K} (X'X)^{-1}$
+    """,
+            unsafe_allow_html=True,
+        )
+
+        # ADD FORMULAS FOR CONFIDENCE INTERVALS
+        # check against statsmodels link below
+        # https://www.statsmodels.org/0.9.0/_modules/statsmodels/regression/_prediction.html#PredictionResults
+    #     st.markdown(
+    #         r"""
+    #     e. Confidence interval is visually more sensitive to sample size than to error variance, i.e.,
+    #     if $n$ is large enough, even for high $\sigma^2$, the confidence interval is small because it depends only on $s^2$ and not on $\sigma^2$:<br>
+    #     Also, CI is wider when further away from mean.<br>
+    # """,
+    #         unsafe_allow_html=True,
+    #     )
 
 
 with c03:
@@ -676,9 +681,7 @@ with c05:
             unsafe_allow_html=True,
         )
 
-    with st.expander(
-        "Relating two formulations of AIC (Greene pp. 47 and 561)"
-    ):
+    with st.expander("Relating two formulations of AIC (Greene pp. 47 and 561)"):
         st.markdown(
             r"""
             Not sure if this is useful, but it clarified things in my head.<br>
