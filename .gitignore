@@ -5,3 +5,5 @@ backup/
 **/backup/
 __pycache__/
 **/__pycache__/
+
+pages/2_fit.py

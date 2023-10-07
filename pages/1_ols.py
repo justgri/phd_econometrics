@@ -4,13 +4,14 @@ import sys
 
 import numpy as np
 import pandas as pd
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
+
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -44,7 +45,9 @@ with c01:
     st.title("Ordinary Least Squares Estimation")
     st.header("1. Visualizing OLS estimates")
 
-    st.write("Play around with sliders to see how the data and estimates change.")
+    st.write(
+        "Play around with sliders to see how the data and estimates change."
+    )
     st.write(
         r"Suppose you have the following true population relationship between $X$ and $y$, with parameters defined by slider values."
     )
@@ -104,7 +107,9 @@ def gen_lin_data(b0, b1, sd, N, rseed):
     }
 
 
-with c01:
+slider_col, s1, chart_col = st.columns((0.8, 0.1, 1))
+
+with slider_col:
     st.latex(
         r"""
             y_i = \beta_0 + \beta_1x_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
@@ -112,10 +117,6 @@ with c01:
     )
     st.latex(r"""\hat{y_i} = """ + r"""b_0 + b_1 x_i""")
 
-
-slider_col, s1, chart_col = st.columns((0.8, 0.1, 1))
-
-with slider_col:
     # Sliders
     b0_cust = st.slider(
         r"Intercept, $\beta_0$",
@@ -247,13 +248,17 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
+        custom_data = gen_lin_data(
+            b0_cust, b1_cust, var_cust, n_cust, random_seed
+        )
 
 
 coefficients = create_summary(custom_data)
 
 with chart_col:
-    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
+    chart_col.pyplot(
+        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
+    )
 
 
 # CSS styles for the table (center and header)
@@ -290,7 +295,8 @@ table_css = """
 
 s0, c02, s1 = utl.narrow_col()
 
-with c02:
+with slider_col:
+    st.write("")
     # display table and plot
     st.write(
         f"{table_css}{styled_table}",
@@ -301,7 +307,7 @@ with c02:
     st.latex(
         f"n= {n_cust} ,"
         + f"R^2 = {custom_data['model'].rsquared:.2f}"
-        + r", s = \sqrt{\frac{\mathbf{e'e}}{n - K}}"
+        + r", \hat{\sigma}"
         + f"= {custom_data['s']:.2f}"
     )
 
@@ -681,7 +687,9 @@ with c05:
             unsafe_allow_html=True,
         )
 
-    with st.expander("Relating two formulations of AIC (Greene pp. 47 and 561)"):
+    with st.expander(
+        "Relating two formulations of AIC (Greene pp. 47 and 561)"
+    ):
         st.markdown(
             r"""
             Not sure if this is useful, but it clarified things in my head.<br>

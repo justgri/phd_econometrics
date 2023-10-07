@@ -160,68 +160,82 @@ with c2:
     )
 
     with st.expander("Click to expand", expanded=True):
-        st.write(
-            "Chapters follow Hayahshi *Econometrics* (1st ed.). Chapters from Greene *Eceonometric Analysis* (8th ed.) given in the parentheses."
-        )
-        st.write(
-            "Subsections are likely to change depending on which topics I find most interesting or challenging."
+        # Page links - potentially hrefs with st.experimental_set_query_params()
+        path_ols = "https://phd-econometrics.streamlit.app/OLS%20Estimation"
+        path_tools = (
+            "https://phd-econometrics.streamlit.app/Tools%20for%20Econometrics"
         )
 
         st.markdown(
             r"""
-    <div class="numbered-header">
-        <b>Chapter 1: Finite-Sample Properties of OLS</b><br>
-    </div>
+            Section headers follow Hayahshi *Econometrics* (1st ed.). Chapters from Greene *Eceonometric Analysis* (8th ed.) given in the parentheses.<br>
+            Subsections are likely to change depending on which topics I find most interesting or challenging.<br>
+            Hyperlinks lead to the corresponding pages on this website.""",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f"""[**Top 10 tools**]({path_tools})"""
+            + r""" **that everyone should know according to Jeffrey Wooldridge**
+        """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            rf"""
+        <div class="numbered-header">
+            <b>Chapter 1: Finite-Sample Properties of OLS</b><br>
+        </div>
         
-    <div class="numbered">
-        1. OLS algebra (Greene Ch 2 - 3.2) <br>
-        2. Hypothesis testing (Greene Ch 5) <br>
-        3. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
-        3. Model selection (Greene Ch 3.5 and Ch 5.8) <br>
-        5. Functional form (Greene Ch 6.5)<br>
-        6. PCA (Greene Ch 4.9)
-    </div>
+        <div class="numbered">
+            1. <a href="{path_ols}" target="_blank">OLS estimation</a> (Greene Ch 2 - 3.2)<br>
+            2. Hypothesis testing (Greene Ch 5) <br>
+            3. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
+            3. Model selection (Greene Ch 3.5 and Ch 5.8) <br>
+            5. Functional form (Greene Ch 6.5)<br>
+            6. PCA (Greene Ch 4.9)
+        </div>
 
-    <br>
+        <br>
 
-    <div class="numbered-header">
-        <b>Chapter 2: Large-Sample Theory</b><br>
-    </div>
+        <div class="numbered-header">
+            <b>Chapter 2: Large-Sample Theory</b><br>
+        </div>
 
-    <div class="numbered">
-        5. Limit theorems, "delta-method" <br>
-        6. Law of large numbers <br>
-        7. Large sample OLS properties <br>
-    </div>
+        <div class="numbered">
+            5. Limit theorems, "delta-method" <br>
+            6. Law of large numbers <br>
+            7. Large sample OLS properties <br>
+        </div>
 
-    <br>
+        <br>
 
-    <div class="numbered-header">
-        <b>Chapter 3: Generalized Method of Moments</b><br>
-    </div>
+        <div class="numbered-header">
+            <b>Chapter 3: Generalized Method of Moments</b><br>
+        </div>
 
-    <div class="numbered">
-        8. Endogeneity <br>
-        9. Instrumental Variables <br>
-        10. IV-related tests <br>
-        11. GMM properties
-    </div>
+        <div class="numbered">
+            8. Endogeneity <br>
+            9. Instrumental Variables <br>
+            10. IV-related tests <br>
+            11. GMM properties
+        </div>
 
-    <br>
-    
-    <div class="numbered-header">
-        <b>Chapter 4: Multiple-Equation GMM</b>
-    </div>
+        <br>
+        
+        <div class="numbered-header">
+            <b>Chapter 4: Multiple-Equation GMM</b>
+        </div>
 
-    <div class="numbered">
-        12. TBD <br>
-        13. TBD <br>
-    </div>
+        <div class="numbered">
+            12. TBD <br>
+            13. TBD <br>
+        </div>
 
-    <br>
+        <br>
 
-    Next semester - Panel Data, Time Series, Cointegration, and MLE. <br>
-    Bonus if time permits (it never does) - Monte Carlo, bootstrapping, gradient descent, causal ML, etc.
-    """,
+        Next semester - Panel Data, Time Series, Cointegration, and MLE. <br>
+        Bonus if time permits (it never does) - Monte Carlo, bootstrapping, gradient descent, causal ML, etc.
+        """,
             unsafe_allow_html=True,
         )
