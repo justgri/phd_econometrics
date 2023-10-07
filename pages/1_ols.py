@@ -319,7 +319,7 @@ with c03:
     with st.expander("Click to expand."):
         st.markdown(
             r"""                
-        1. Variance of $\mathbf{b}$ (and thus their standard errors) does not depend on population $\beta$. <br>
+        1. Variance of $\mathbf{b}$ (and thus the standard error) does not depend on population $\beta$. <br>
         It depends on variance of errors $s^2$ (and thus $\sigma^2)$, $N-k$, and $X'X$.<br>
         Note that higher variance of $X$ leads to a lower variance of $\mathbf{b}$, which is intuitive because you cover a wider range of $X$s.<br>
         

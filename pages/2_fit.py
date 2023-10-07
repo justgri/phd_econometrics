@@ -366,6 +366,7 @@ with c03:
         1. Causality
         2. Unbiasedness of the coefficients
         3. Appropriateness of the model
+        4. Whether OOS predictions are reasonable (e.g., high R^2 doesn't prevent forecasting of negative wages)
         """,
         unsafe_allow_html=True,
     )
