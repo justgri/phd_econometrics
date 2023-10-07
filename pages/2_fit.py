@@ -25,7 +25,9 @@ utl.local_css("src/styles/styles_pages.css")
 random_seed = 0
 
 ## Data viz part
-# TBD
+# How R-sq is calculated
+# How R-sq and other measures depend on sample size, error variance, and true parameters
+# Also how much R-sq, AIC, and BIC are penalized by adding more regressors?
 
 ## Theory part
 # TBD
@@ -314,15 +316,20 @@ with c03:
     with st.expander("Click to expand."):
         st.markdown(
             r"""
-        1. $R^2 = 0$ in expectation if $\beta_1=0$ or if $X_i = \bar{X}$. Also $R^2$ is independent of the intercept.<br>
+        1. $R^2$ is expected to be 0 if $\beta_1=0$ or if $X_i = \bar{X}$.<br>
 
             $R^2 = \frac{ (\hat{y} - \bar{y})' (\hat{y} - \bar{y}) }{ (y - \bar{y})' (y - \bar{y}) }
             = \frac{\sum_{i=1}^{N} (\hat{y}_i - \bar{y})^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
             = \frac{\sum_{i=1}^{N} (\hat{\beta_1} (X_i - \bar{X}))^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}$
             , because $\hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{X}$
+
+        2. $R^2$ is independent of the size of the intercept $b_0$ but is dependent on the size of the slope $b_1$.
+        
             """,
             unsafe_allow_html=True,
         )
+
+        # Explain why R^2 increases with \beta - what's the interpretation?
 
         # ADD FORMULAS FOR CONFIDENCE INTERVALS
 
@@ -340,18 +347,56 @@ with c03:
 
 
 with c03:
-    st.header("2. OLS in matrix notation")
-    st.write("Check out Matteo Courthoud's website for summary:")
-    st.link_button(
-        "OLS Algebra",
-        "https://matteocourthoud.github.io/course/metrics/05_ols_algebra/",
-        type="primary",
+    st.header("2. Interpretation")
+    st.markdown(r"""<h5>R-squared indicates:</h5>""", unsafe_allow_html=True)
+    st.markdown(
+        r"""
+    1. "Whether variation in $x$ is a good predictor of variation in $y$" - useful for prediction accuracy (Greene Ch 3.5).<br>
+    2. Proportion of total variation in $y$ that is accounted by variation in $x$ - useful for model comparison (if models are similar).<br>
+    3. Measure of fit - how close the data are to the estimated model - useful to get a sense of over/under fitting.
+""",
+        unsafe_allow_html=True,
     )
 
-    st.header("3. Fit measures interpretation")
-    st.write("TBD - Greene Chapter 4, Table 4.1:")
+    st.markdown(
+        r"""<h5>R-squared does NOT indicate:</h5>""", unsafe_allow_html=True
+    )
+    st.markdown(
+        r"""
+        1. Causality
+        2. Unbiasedness of the coefficients
+        3. Appropriateness of the model
+        """,
+        unsafe_allow_html=True,
+    )
 
-    st.markdown("""TBD""", unsafe_allow_html=True)
+    st.markdown(
+        r"""<h5>R-sq and R-sq adj. vs AIC and BIC</h5>""",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        r"""Since R-sq increases by including more regressors, we need a measure that penalizes for adding regressors.<br>
+        It has been argued that the adjusted R-sq doesn't penalize heavily enough, thus AIC and BIC measures have been proposed (Greene p. 47).<br>""",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        r"""
+        "Choosing a model based on the lowest AIC is logically the same as using $\bar{R}^2$ in the linear model, nonstatistical, albeit widely accepted.
+        The AIC and BIC are information criteria, not fit measures as such." (Greene, p.561)<br>
+        APC has a direct relationship to $R^2$.<br>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.header("3. More details")
+    st.write("Check out the following website: TBD")
+    # st.link_button(
+    #     "OLS Algebra",
+    #     "https://matteocourthoud.github.io/course/metrics/05_ols_algebra/",
+    #     type="primary",
+    # )
+
 
 s0, c04, s1 = utl.wide_col()
 
@@ -361,14 +406,9 @@ with c04:
     def tabs_code_theory():
         return st.tabs(["Theory", "Code numpy", "Code statsmodels"])
 
+    ### Error sums
     st.markdown(
-        "#### Solving for OLS coefficients",
-        unsafe_allow_html=True,
-    )
-
-    ### OLS Additional Concepts
-    st.markdown(
-        "#### OLS Errors",
+        "#### Error sums",
         unsafe_allow_html=True,
     )
     st.markdown(
@@ -391,18 +431,6 @@ with c04:
             Total sum of squares (SST) aka Total Variation:<br>
             $SST = \sum_{i=1}^n (y_i-\bar{y_i})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 + \sum_{i=1}^n (e_i)^2$ <br>
             $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e = SSR + SSE}$<br>
-            
-            OLS estimate for $\sigma^2$ aka Standard Error of the Regression (SER):<br>
-            $s^2 \equiv \frac{SSE}{n-K} = \frac{\mathbf{e'e}}{n-K}$<br>
-            $SER = \sqrt{s^2} = s$ (think of MSE)<br>
-        
-            Sampling error:<br>
-            $\mathbf{b} - \beta = \mathbf{(X'X)^{-1}X'y - \beta} = \mathbf{(X'X)^{-1}X' \varepsilon}$ (sampling error)<br>
-            
-            Conditional variance of $\mathbf{b}$ and standard error of $b_k$:<br>
-            $Var(\mathbf{b|X}) = s^2(X'X)^{-1}$<br>
-            $SE(b_k) = \{[s^2(X'X)^{-1}]_{kk}\}^{1/2}$<br>
-            (square root of *k*th diagonal element of the variance matrix)
          """,
             unsafe_allow_html=True,
         )
@@ -421,17 +449,6 @@ with c04:
         # Total sum of squares
         y_centered = y - np.mean(y)
         SST = y_centered.dot(y_centered)
-
-        # OLS estimate for sigma^2 and sigma
-        s_sq = SSE / (n - K)
-        s = np.sqrt(s_sq)
-
-        # Sampling error (only b/c we know true beta values)
-        sampling_error = b_ols - beta
-
-        # Conditional variance and standard errors of beta
-        var_b = s_sq * np.linalg.inv(X.T.dot(X))
-        SE_b = np.sqrt(np.diag(var_b))
         """
         st.code(ols_code_err, language="python")
 
@@ -448,17 +465,6 @@ with c04:
         
         # Total sum of squares
         SST = SSE + SSR
-        
-        # OLS estimate for sigma^2 and sigma
-        s_sq = model.mse_resid
-        s = model.mse_resid ** 0.5
-        
-        # Sampling error (only b/c we know true beta values)
-        sampling_error = model.params - beta
-        
-        # Conditional variance and standard errors of beta
-        var_b = model.cov_params()
-        SE_b = model.bse
         """
 
         st.code(ols_code_err_b, language="python")
@@ -468,9 +474,6 @@ with c04:
     st.markdown("#### Model fit and selection measures")
     st.markdown(
         r"""
-        "Choosing a model based on the lowest AIC is logically the same as using $\bar{R}^2$ in the linear model, nonstatistical, albeit widely accepted.
-        The AIC and BIC are information criteria, not fit measures as such." (Greene, p.561)<br>
-        APC has a direct relationship to $R^2$.<br>
         NB: $R^2$ definition below requires a constant term to be included in the model.<br>
         """,
         unsafe_allow_html=True,

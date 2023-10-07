@@ -318,19 +318,8 @@ with c03:
 
     with st.expander("Click to expand."):
         st.markdown(
-            r"""
-        1. $R^2 = 0$ in expectation if $\beta_1=0$ or if $X_i = \bar{X}$. Also $R^2$ is independent of the intercept.<br>
-
-            $R^2 = \frac{ (\hat{y} - \bar{y})' (\hat{y} - \bar{y}) }{ (y - \bar{y})' (y - \bar{y}) }
-            = \frac{\sum_{i=1}^{N} (\hat{y}_i - \bar{y})^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
-            = \frac{\sum_{i=1}^{N} (\hat{\beta_1} (X_i - \bar{X}))^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}$
-            , because $\hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{X}$
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown(
             r"""                
-        2. Variance of $\mathbf{b}$ (and thus their standard errors) does not depend on population $\beta$. <br>
+        1. Variance of $\mathbf{b}$ (and thus their standard errors) does not depend on population $\beta$. <br>
         It depends on variance of errors $s^2$ (and thus $\sigma^2)$, $N-k$, and $X'X$.<br>
         Note that higher variance of $X$ leads to a lower variance of $\mathbf{b}$, which is intuitive because you cover a wider range of $X$s.<br>
         
@@ -341,6 +330,7 @@ with c03:
 
         # ADD FORMULAS FOR CONFIDENCE INTERVALS
         # check against statsmodels link below
+        # Greene Ch 4.8 (p. 86)
         # https://www.statsmodels.org/0.9.0/_modules/statsmodels/regression/_prediction.html#PredictionResults
     #     st.markdown(
     #         r"""
@@ -464,38 +454,39 @@ with c04:
         "#### OLS Errors",
         unsafe_allow_html=True,
     )
-    st.markdown(
-        """NB: Hayashi and Greene classically disagree on notation for the sum of squared residuals (SSE or SSR), so I'll follow Greene.""",
-        unsafe_allow_html=True,
-    )
 
     f2_c1, f2_c2, f2_c3 = tabs_code_theory()
     with f2_c1:
+        # Prediction error (MSPE) - Greene p. 86
+        # review the following sources
+        # https://dept.stat.lsa.umich.edu/~kshedden/Courses/Regression_Notes/prediction.pdf
+        # http://web.vu.lt/mif/a.buteikis/wp-content/uploads/PE_Book/3-7-UnivarPredict.html
+
         st.markdown(
             r"""
-            Error Sum of Squares (SSE) aka Sum of Squared Residuals (SSR or RSS, hence confusion):<br>
-            $SSE = \sum_{i=1}^n (y_i-\hat{y_i})^2 = \sum_{i=1}^n (e_i)^2 =  \mathbf{e'e = \varepsilon' M \varepsilon}$<br>
-            (this is SSR according to Hayashi)<br>
-
-            Regression sum of squares (SSR) aka Explained Sum of Squares (ESS):<br>
-            $SSR = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{\hat{y}})^2$<br>
-            $SSR =  \mathbf{b'X'M^0Xb}$, where $\mathbf{M^0}$ is the centering matrix<br>
-
-            Total sum of squares (SST) aka Total Variation:<br>
-            $SST = \sum_{i=1}^n (y_i-\bar{y_i})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 + \sum_{i=1}^n (e_i)^2$ <br>
-            $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e = SSR + SSE}$<br>
-            
             OLS estimate for $\sigma^2$ aka Standard Error of the Regression (SER):<br>
             $s^2 \equiv \frac{SSE}{n-K} = \frac{\mathbf{e'e}}{n-K}$<br>
-            $SER = \sqrt{s^2} = s$ (think of MSE)<br>
+            $s = \sqrt{s^2} = s$<br>
         
-            Sampling error:<br>
-            $\mathbf{b} - \beta = \mathbf{(X'X)^{-1}X'y - \beta} = \mathbf{(X'X)^{-1}X' \varepsilon}$ (sampling error)<br>
-            
             Conditional variance of $\mathbf{b}$ and standard error of $b_k$:<br>
             $Var(\mathbf{b|X}) = s^2(X'X)^{-1}$<br>
             $SE(b_k) = \{[s^2(X'X)^{-1}]_{kk}\}^{1/2}$<br>
             (square root of *k*th diagonal element of the variance matrix)
+
+            Prediction error and its variance - take a new vector $\mathbf{x}^0$ for which you want to predict dependent variable $\mathbf{y}^0$:<br>
+            $\mathbf{y}^0 = \mathbf{x}^{0\prime} \mathbf{b} + \varepsilon^0 = \mathbf{x}^{0\prime} \mathbf{b}$ (by A3)<br>
+            $e^0 = \hat{y}^0 - y^0 = \mathbf{(b - \beta)'x}^0 - \varepsilon^0$<br>
+            $Var[e^0 | \mathbf{X, x}^0] = \sigma^2 + \mathbf{x}^{0\prime} [\sigma^2 (X'X)^{-1}]\mathbf{x}^0$<br>
+            
+            Prediction variance can be estimated by using $s^2$ instead of $\sigma^2$, thus the standard error of prediction error is:<br>
+            $se(e^0) = \sqrt{s^2 + \mathbf{x}^{0\prime} [s^2 (X'X)^{-1}]\mathbf{x}^0}$<br>
+            
+            Prediction interval = $\hat{y}^0 \pm t_{\alpha/2, n-K} se(e^0)$<br>
+
+            Sampling error:<br>
+            $\mathbf{b} - \beta = \mathbf{(X'X)^{-1}X'y - \beta} = \mathbf{(X'X)^{-1}X' \varepsilon}$ (sampling error)<br>
+            (only relevant if $\beta$ is known)
+
          """,
             unsafe_allow_html=True,
         )
@@ -504,19 +495,8 @@ with c04:
         ols_code_err = """
         import numpy as np
 
-        # Sum of squared errors
-        SSE = e.dot(e)
-        
-        # Regression sum of squares
-        y_hat_centered = y_hat - np.mean(y_hat)
-        SSR = y_hat_centered.dot(y_hat_centered)
-
-        # Total sum of squares
-        y_centered = y - np.mean(y)
-        SST = y_centered.dot(y_centered)
-
         # OLS estimate for sigma^2 and sigma
-        s_sq = SSE / (n - K)
+        s_sq = e.dot(e) / (n - K)
         s = np.sqrt(s_sq)
 
         # Sampling error (only b/c we know true beta values)
@@ -528,19 +508,18 @@ with c04:
         """
         st.code(ols_code_err, language="python")
 
+        # Prediction confidence intervals - double check
+        # deg_freedom = X.shape[0] - X.shape[1]  # n - K
+        # alpha = 0.05
+        # t_score = t.ppf(1 - alpha/2, deg_freedom)
+        # ci = np.column_stack(
+        #     (y_hat - t_score * y_hat_se, y_hat + t_score * y_hat_se)
+        # )
+
     with f2_c3:
         ols_code_err_b = """
         import statsmodels.api as sm
         model = sm.OLS(y, X).fit()
-
-        # Sum of squared errors
-        SSE = model.ssr # this is SSE according to Greene
-
-        # Regression sum of squares
-        SSR = model.ess
-        
-        # Total sum of squares
-        SST = SSE + SSR
         
         # OLS estimate for sigma^2 and sigma
         s_sq = model.mse_resid
@@ -556,100 +535,10 @@ with c04:
 
         st.code(ols_code_err_b, language="python")
 
-    st.divider()
-
-    st.markdown("#### Model fit and selection measures")
-    st.markdown(
-        r"""
-        "Choosing a model based on the lowest AIC is logically the same as using $\bar{R}^2$ in the linear model, nonstatistical, albeit widely accepted.
-        The AIC and BIC are information criteria, not fit measures as such." (Greene, p.561)<br>
-        APC has a direct relationship to $R^2$.<br>
-        NB: $R^2$ definition below requires a constant term to be included in the model.<br>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    f3_c1, f3_c2, f3_c3 = tabs_code_theory()
-
-    # Sources for AIC and BIC
-    sas_source = "https://documentation.sas.com/doc/en/vfcdc/8.5/vfug/p0uawamu7dmtc2n1cllfwajyvlko.htm"
-    stata_source = "https://www.stata.com/manuals13/restatic.pdf"
-    stack_ex = "https://stats.stackexchange.com/questions/490056/aic-bic-formula-wrong-in-james-witten"
-
-    with f3_c1:
-        st.markdown(
-            r"""          
-            R-sq, Adjusted R-sq, and Pseudo R-sq:<br>
-            $R^2 = \frac{SSR}{SST} = \frac{SST - SSE}{SST} = 1 - \frac{SSE}{SST}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
-            $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$<br>
-            McFadden Pseudo  $R^2 = 1 - \frac{\text{ln} L}{\text{ln} L_0} = \frac{-\text{ln}(1-R^2)}{1+\text{ln}(2\pi) + \text{ln}(s_y^2)}$<br>
-            
-            Amemiya's Prediction Criterion (APC):<br>
-            $APC=\frac{SSE}{n-K}(1+\frac{K}{n}) = SSE \frac{n+K}{n-K}$<br>
-
-            AIC and BIC for OLS, when error variance is known (Greene p. 47):<br>
-            $AIC = \text{ln}(\frac{SSE}{n}) + \frac{2K}{n}$<br>
-            $BIC = \text{ln}(\frac{SSE}{n}) + \frac{\text{ln}(n) K}{n}$<br>
-            
-            AIC and BIC are more often calculated for any MLE as follows (Greene p. 561):<br>
-            $AIC = -2 \text{ln}(L)+2K$<br>
-            $BIC = -2 \text{ln}(L) + \text{ln}(n) K  $<br>
-            
-            In OLS, SSE is proportional to log-likelihood, so the two formulas would lead to the same model selection.<br>
-            NB: Even for OLS, Python *statsmodels*, STATA *estat ic*, and R *lm* use the latter definition, whereas SAS uses the former multiplied by $n$.
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with f3_c2:
-        r2_code = """
-        import numpy as np
-        # R-sq and R-sq adjusted
-        y_centered = y - np.mean(y)
-        r_sq = 1 - e.dot(e) / y_centered.dot(y_centered)
-        r_sq_adj = 1 - ((n - 1) / (n - K)) * (1 - r_sq)
-
-        # Pseudo R-sq
-        var_y = np.var(y)
-        pseudo_r_sq = (-1 * np.log(1 - r_sq) / (1 + np.log(2 * np.pi) + np.log(var_y)))
-                
-        # Amemiya's Prediction Criterion
-        APC = (e.dot(e) / n) * (n + K) / (n - K)
-
-        # AIC and BIC, first get log likelihood
-        ln_L = (-n / 2) * (1 + np.log(2 * np.pi) + np.log(SSE / n))
-        AIC = -2 * ln_L + 2 * K
-        BIC = -2 * ln_L + K * np.log(n)
-        """
-        st.code(r2_code, language="python")
-
-    with f3_c3:
-        r2_code_built_in = """
-        import statsmodels.api as sm
-        import numpy as np
-
-        model = sm.OLS(y, X).fit()
-
-        # R-sq and R-sq adjusted
-        r_sq = model.rsquared
-        r_sq_adj = model.rsquared_adj
-
-        # Pseudo R-sq
-        ln_L = model.llf
-        model_constant = sm.OLS(y, np.ones(n)).fit()
-        ln_L_0 = model_constant.llf
-        pseudo_r_sq = 1 - ln_L / ln_L_0
-
-        # Amemiya's Prediction Criterion - no built-in module
-        APC = (e.dot(e) / n) * (n + K) / (n - K)
-
-        # AIC and BIC
-        AIC = model.aic
-        BIC = model.bic
-
-        """
-
-        st.code(r2_code_built_in, language="python")
+        # Prediction confidence intervals - double check
+        # predictions = model.get_prediction(X)
+        # y_hat_se = predictions.se_mean
+        # ci = predictions.conf_int(alpha=0.05)  # 95% CI
 
     st.divider()
 
@@ -658,20 +547,14 @@ with c05:
     st.header("5. Proofs to remember")
     sst_proof = "https://stats.stackexchange.com/questions/207841/why-is-sst-sse-ssr-one-variable-linear-regression/401299#401299"
 
-    with st.expander("SST = SSR + SSE"):
-        st.markdown(
-            rf"Proof from Greene Section 3.5 (also see [Stack Exchange]({sst_proof})):<br>"
-            + r"""
-                $y_i - \bar{y} = \mathbf{x}_i'\mathbf{b} + e_i$<br>
-                $y_i - \bar{y} = \hat{y}_i - \bar{y} + e_i = (\mathbf{x}_i - \mathbf{\bar{x}})'\mathbf{b} + e_i$<br>
-                $\mathbf{M^0y= M^0Xb + M^0e}$<br>
-                $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e} = SSR + SSE$<br>
-                (need to expand between last two steps, but main trick is that $\mathbf{e'M^0X = e'X=0}$)<br>
-                """,
-            unsafe_allow_html=True,
+    with st.expander("OLS estimate is BLUE"):
+        st.link_button(
+            "See Matteo Courthoud's website",
+            "https://matteocourthoud.github.io/course/metrics/05_ols_algebra/#blue",
+            type="secondary",
         )
 
-    with st.expander("Transformed Variables"):
+    with st.expander("Transformed variables"):
         st.markdown(
             r"""
             Proof from Greene THEOREM 3.8:<br>
@@ -684,26 +567,5 @@ with c05:
             $\mathbf{u = y - Z(P^{-1}b) = y - XP(P^{-1}b) = y - Xb = e}$<br>
             Since residuals are identical and $\mathbf{y'M^0y}$ is unchanged, $R^2$ is also identical in two regressions.
             """,
-            unsafe_allow_html=True,
-        )
-
-    with st.expander(
-        "Relating two formulations of AIC (Greene pp. 47 and 561)"
-    ):
-        st.markdown(
-            r"""
-            Not sure if this is useful, but it clarified things in my head.<br>
-            
-            Recall, $SSE = \mathbf{e'e}$<br>
-            In the linear model with normally distributed disturbances, the maximized log likelihood is<br>
-            $\text{ln} L = -\frac{n}{2} [1 + \text{ln}(2 \pi) + \text{ln}(\frac{SSE}{n})]$<br>
-            Ignore the constants and notice that<br>
-            $\text{ln} L \propto -\frac{n}{2} \text{ln}(\frac{SSE}{n})$<br>
-            $-2 \text{ln} L \propto n \text{ln}(\frac{SSE}{n})$<br>
-            $-2 \text{ln} L + 2K \propto n \text{ln}(\frac{SSE}{n}) + 2K$<br>
-            $-2 \text{ln} L + 2K \propto \text{ln}(\frac{SSE}{n}) + \frac{2K}{n}$<br>
-            Which we wanted to show.<br>
-            Might have been enough to just state that $\text{ln} L \propto -\text{ln}(\frac{SSE}{n})$.
-""",
             unsafe_allow_html=True,
         )
