@@ -161,10 +161,11 @@ with c2:
 
     with st.expander("Click to expand", expanded=True):
         # Page links - potentially hrefs with st.experimental_set_query_params()
-        path_ols = "https://phd-econometrics.streamlit.app/OLS%20Estimation"
         path_tools = (
             "https://phd-econometrics.streamlit.app/Tools%20for%20Econometrics"
         )
+        path_ols = "https://phd-econometrics.streamlit.app/OLS%20Estimation"
+        path_fit = "https://phd-econometrics.streamlit.app/Fit%20Measures"
 
         st.markdown(
             r"""
@@ -189,9 +190,9 @@ with c2:
         
         <div class="numbered">
             1. <a href="{path_ols}" target="_blank">OLS estimation</a> (Greene Ch 2 - 3.2)<br>
-            2. Hypothesis testing (Greene Ch 5) <br>
-            3. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
-            3. Model selection (Greene Ch 3.5 and Ch 5.8) <br>
+            2. <a href="{path_fit}" target="_blank">Fit measures</a> (Greene Ch 3.5 and Ch 5.8) <br>
+            3. Hypothesis testing (Greene Ch 5) <br>
+            4. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
             5. Functional form (Greene Ch 6.5)<br>
             6. PCA (Greene Ch 4.9)
         </div>
@@ -203,9 +204,9 @@ with c2:
         </div>
 
         <div class="numbered">
-            5. Limit theorems, "delta-method" <br>
-            6. Law of large numbers <br>
-            7. Large sample OLS properties <br>
+            7. Limit theorems, "delta-method" <br>
+            8. Law of large numbers <br>
+            9. Large sample OLS properties <br>
         </div>
 
         <br>
@@ -215,10 +216,10 @@ with c2:
         </div>
 
         <div class="numbered">
-            8. Endogeneity <br>
-            9. Instrumental Variables <br>
-            10. IV-related tests <br>
-            11. GMM properties
+            10. Endogeneity <br>
+            11. Instrumental Variables <br>
+            12. IV-related tests <br>
+            13. GMM properties
         </div>
 
         <br>
@@ -228,8 +229,8 @@ with c2:
         </div>
 
         <div class="numbered">
-            12. TBD <br>
-            13. TBD <br>
+            14. TBD <br>
+            15. TBD <br>
         </div>
 
         <br>
