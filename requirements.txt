@@ -1,7 +1,7 @@
 numpy
 pandas
 plotly
-streamlit>=1.27.0
+streamlit>=1.27.2
 matplotlib
 scikit-learn
 st_pages>=0.4.5
