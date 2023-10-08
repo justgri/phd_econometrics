@@ -159,6 +159,15 @@ cols_set1 = px.colors.qualitative.Set1
 
 cols_set1_plt = cm.Set1.colors
 
+set1_red = cols_set1_plt[0]
+set1_blue = cols_set1_plt[1]
+set1_green = cols_set1_plt[2]
+set1_purple = cols_set1_plt[3]
+set1_orange = cols_set1_plt[4]
+set1_yellow = cols_set1_plt[5]
+set1_brown = cols_set1_plt[6]
+set1_pink = cols_set1_plt[7]
+set1_grey = cols_set1_plt[8]
 
 """
 Color templates

@@ -10,7 +10,7 @@ icon = "🛠"
 
 [[pages]]
 path = "pages/1_ols.py"
-name = "OLS Estimation"
+name = "Linear Regression"
 icon = "📈"
 
 [[pages]]
