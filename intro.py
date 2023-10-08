@@ -27,8 +27,13 @@ email_url = "mailto:justinas.grigaitis@econ.uzh.ch"
 # Intro
 with c1:
     st.title("Econometrics for PhD Students")
+
+    # Intuitive visuals. Rigorous theory. Reproducible code.
+    # Intuitive visuals. Rigorous theory. Simple code.
+    # Intuitive visuals. Rigorous theory. Easy code.
+
     st.markdown(
-        '<span style="font-size: 28px; display: block; margin-bottom: 5px;">*Intuitive visuals. Rigorous theory. Reproducible code.*</span>',
+        '<span style="font-size: 28px; display: block; margin-bottom: 5px;">*Intuitive visuals. Rigorous theory. Simple code.*</span>',
         unsafe_allow_html=True,
     )
 

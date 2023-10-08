@@ -39,7 +39,7 @@ s1, c01, s2 = utl.wide_col()
 # Dashboard header
 
 with c01:
-    st.title("Model fit and selection measures")
+    st.title("Model fit measures")
     st.divider()
     st.header("1. Visualizing R squared")
 
