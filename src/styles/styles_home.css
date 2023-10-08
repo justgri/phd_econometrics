@@ -19,3 +19,9 @@ html {
 .numbered {
     margin-left: 20px;
 }
+
+.stImage img {
+    display: block;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
