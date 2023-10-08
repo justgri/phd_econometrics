@@ -12,6 +12,7 @@ st.set_page_config(
     page_icon="📈",
     layout="wide",
 )
+
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0
@@ -21,7 +22,9 @@ s1, c1, s2 = utl.wide_col()
 # Dashboard header
 with c1:
     st.title("Top 10 Tools for Econometrics")
-    st.header("According to Jeffrey Wooldridge")
+    st.divider()
+    st.markdown(r"""<h3>According to Jeffrey Wooldridge</h3>""", unsafe_allow_html=True)
+
 
 s1, c2, s2 = utl.wide_col()
 
@@ -197,13 +200,17 @@ with c2:
     jmw_twitter = "https://twitter.com/jmwooldridge"
     tr_source = "https://bookdown.org/ts_robinson1994/10EconometricTheorems/"
     st.write(
-        f"Source: Jeffrey Wooldridge [@jmwooldridge]({jmw_twitter}), for tweets organized by topic - [link]({jmw_source})."
+        f"Source: Jeffrey Wooldridge [@jmwooldridge]({jmw_twitter}). For his tweets organized by topic check this - [link]({jmw_source})."
     )
     st.write(
         f"Thomas Robinson from LSE elaborate on each of them in this nice e-book - [link]({tr_source})."
     )
 
-    st.divider()
+    # st.markdown(
+    #     "<hr style='margin-top: 0; margin-bottom: 5px;'>",
+    #     unsafe_allow_html=True,
+    # )
+
     st.markdown(
         r"""
     <h5>1. Law of Iterated Expectations, Law of Total Variance </h5>

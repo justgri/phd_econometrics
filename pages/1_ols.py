@@ -45,19 +45,18 @@ with c01:
     st.divider()
     st.header("1. Visualizing OLS estimates")
 
-    st.write("Play around with sliders to see how the data and estimates change.")
-    st.write(
-        r"Suppose you have the following true population relationship between $X$ and $y$, with parameters defined by slider values."
-    )
-    st.write(
-        r"You then draw a sample of size $n$ from that population and estimate OLS coefficients, $b_0$ and $b_1$."
+    st.markdown(
+        r"""Suppose the true population relationship between $X$ and $y$ is defined by the slider values below.<br>
+        You then draw a sample of size $n$ from that population and estimate OLS coefficients, $b_0$ and $b_1$.<br>
+        Move the sliders to see how the sample estimates change with different population parameters.""",
+        unsafe_allow_html=True,
     )
     st.latex(
         r"""
-            y_i = \beta_0 + \beta_1x_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
+            y_i = \beta_0 + \beta_1x_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2) \\
+            \hat{y_i} = b_0 + b_1 x_i
         """
     )
-    st.latex(r"""\hat{y_i} = b_0 + b_1 x_i""")
 
 
 def gen_lin_data(b0, b1, sd, N, rseed):

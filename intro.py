@@ -168,9 +168,7 @@ with c2:
     )
 
     # Page links - potentially hrefs with st.experimental_set_query_params()
-    path_tools = (
-        "https://phd-econometrics.streamlit.app/Tools%20for%20Econometrics"
-    )
+    path_tools = "https://phd-econometrics.streamlit.app/Tools%20for%20Econometrics"
     path_ols = "https://phd-econometrics.streamlit.app/OLS%20Estimation"
     path_fit = "https://phd-econometrics.streamlit.app/Fit%20Measures"
 
