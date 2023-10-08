@@ -4,14 +4,13 @@ import sys
 
 import numpy as np
 import pandas as pd
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -41,11 +40,10 @@ s1, c01, s2 = utl.wide_col()
 
 with c01:
     st.title("Model fit and selection measures")
+    st.divider()
     st.header("1. Visualizing R squared")
 
-    st.write(
-        "Play around with sliders to see how the data and estimates change."
-    )
+    st.write("Play around with sliders to see how the data and estimates change.")
     st.write(
         r"""Suppose you have the following true population relationship between $X$ and $y$, with parameters defined by slider values.
         You then draw a sample of size $n$ from that population and estimate OLS coefficients, $b_0$ and $b_1$."""
@@ -199,9 +197,7 @@ def plot_ols(data_custom, b0, b1):
     y_mean = np.mean(data_custom["y"])
 
     # Add a horizontal line for y-bar
-    plt.axhline(
-        y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=1.5
-    )
+    plt.axhline(y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=1.5)
 
     # Create standard y-ticks between y_lb and y_ub
     y_ticks = list(range(y_lb, y_ub + 1, 2))
@@ -261,9 +257,7 @@ def plot_ols(data_custom, b0, b1):
 
 
 with chart_col:
-    chart_col.pyplot(
-        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
-    )
+    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
 
 
 def generate_html_table(model):
@@ -296,9 +290,7 @@ def generate_html_table(model):
                     <tbody>"""
 
     for name, formula, value in data:
-        html_string += (
-            f"<tr><td>{name}</td><td>{formula}</td><td>{value:.2f}</td></tr>"
-        )
+        html_string += f"<tr><td>{name}</td><td>{formula}</td><td>{value:.2f}</td></tr>"
 
     html_string += "</tbody></table>"
 
@@ -363,9 +355,7 @@ with c03:
         unsafe_allow_html=True,
     )
 
-    st.markdown(
-        r"""<h5>R-squared does NOT indicate:</h5>""", unsafe_allow_html=True
-    )
+    st.markdown(r"""<h5>R-squared does NOT indicate:</h5>""", unsafe_allow_html=True)
     st.markdown(
         r"""
         1. Causality
@@ -593,9 +583,7 @@ with c05:
             unsafe_allow_html=True,
         )
 
-    with st.expander(
-        "Relating two formulations of AIC (Greene pp. 47 and 561)"
-    ):
+    with st.expander("Relating two formulations of AIC (Greene pp. 47 and 561)"):
         st.markdown(
             r"""
             Not sure if this is useful, but it clarified things in my head.<br>
