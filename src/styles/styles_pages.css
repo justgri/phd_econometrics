@@ -46,3 +46,15 @@ html {
 span.math.math-inline span.katex span.katex-mathml {
     margin: 20px !important;
 }
+
+
+th {
+    background-color: lightblue;
+    text-align: center;
+}
+
+td,
+th {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+}

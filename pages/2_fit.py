@@ -20,6 +20,7 @@ st.set_page_config(
     page_icon="📈",
     layout="wide",
 )
+
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0
@@ -46,22 +47,30 @@ with c01:
         "Play around with sliders to see how the data and estimates change."
     )
     st.write(
-        r"Suppose you have the following true population relationship between $X$ and $y$, with parameters defined by slider values."
+        r"""Suppose you have the following true population relationship between $X$ and $y$, with parameters defined by slider values.
+        You then draw a sample of size $n$ from that population and estimate OLS coefficients, $b_0$ and $b_1$."""
     )
-    st.write(
-        r"You then draw a sample of size $n$ from that population and estimate OLS coefficients, $b_0$ and $b_1$."
+
+    st.latex(
+        r"""
+            y_i = \beta_0 + \beta_1x_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
+        """
     )
+    st.latex(r"""\hat{y_i} = b_0 + b_1 x_i""")
 
 
 def gen_lin_data(b0, b1, sd, N, rseed):
     np.random.seed(rseed)
-    # generate X
+    # fix X values
+    X_fix = [-2, -0.5, 2, 0.5, -1.25, 1.25, 0]
     K = 2
-    X = np.random.uniform(-10, 10, (N, K - 1))
-    X = np.column_stack((np.ones(N), X))
+    X = np.array(X_fix[:N])
+    X = np.column_stack((np.ones(len(X)), X))
 
     # generate  error term
-    eps = np.random.normal(0, sd, N)
+    eps_fix = np.array([-1 / 2 * sd, sd, -sd, -sd, -sd, 1 / 2 * sd, -sd])
+    eps = np.array(eps_fix[:N])
+    # eps = np.random.normal(0, sd, N)
 
     # y = xB + eps
     y = np.dot(X, np.array([b0, b1])) + eps
@@ -74,21 +83,12 @@ def gen_lin_data(b0, b1, sd, N, rseed):
     y_hat = predictions.predicted_mean
     y_hat_se = predictions.se_mean
 
-    # get 95% confidence interval
-    ci = predictions.conf_int(alpha=0.05)  # 95% CI
-    deg_freedom = X.shape[0] - X.shape[1]  # n - K
-
-    # get CI manually - not needed
-    # t_score = t.ppf(0.975, deg_freedom)
-    # ci = np.column_stack(
-    #     (y_hat - t_score * y_hat_se, y_hat + t_score * y_hat_se)
-    # )
-
-    # get error parameters - not needed
+    # get error parameters
     e = y - y_hat
+    deg_freedom = X.shape[0] - X.shape[1]  # n - K
     s = np.sqrt(np.sum(e**2) / deg_freedom)
 
-    # calculate R^2 manually - not needed
+    # calculate R^2 manually
     y_bar = np.mean(y)
     ss_tot = np.sum((y - y_bar) ** 2)
     ss_res = np.sum((y - y_hat) ** 2)
@@ -99,7 +99,6 @@ def gen_lin_data(b0, b1, sd, N, rseed):
         "x": X,
         "s": s,
         "y_hat": y_hat,
-        "ci": ci,
         "model": model,
     }
 
@@ -107,38 +106,31 @@ def gen_lin_data(b0, b1, sd, N, rseed):
 slider_col, s1, chart_col = st.columns((0.8, 0.1, 1))
 
 with slider_col:
-    st.latex(
-        r"""
-            y_i = \beta_0 + \beta_1x_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
-        """
-    )
-    st.latex(r"""\hat{y_i} = """ + r"""b_0 + b_1 x_i""")
-
     # Sliders
     b0_cust = st.slider(
         r"Intercept, $\beta_0$",
-        min_value=-10.0,
-        max_value=10.0,
+        min_value=-1.5,
+        max_value=1.5,
         value=0.0,
         step=0.1,
     )
     b1_cust = st.slider(
-        r"Slope, $\beta_1$", min_value=-5.0, max_value=5.0, value=0.0, step=0.1
+        r"Slope, $\beta_1$", min_value=-1.5, max_value=1.5, value=1.0, step=0.1
     )
     var_cust = st.slider(
         r"Error SD, $\sqrt{var(\varepsilon)} = \sigma$",
         min_value=0.1,
-        max_value=20.0,
-        value=10.0,
+        max_value=2.0,
+        value=1.0,
         step=0.1,
     )
 
     n_cust = st.slider(
-        "Sample size, $n$",
-        min_value=10,
-        max_value=1000,
-        value=500,
-        step=10,
+        "Points displayed, $n$",
+        min_value=3,
+        max_value=7,
+        value=4,
+        step=1,
     )
 
 custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
@@ -147,110 +139,126 @@ custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 def plot_ols(data_custom, b0, b1):
     fig, ax = plt.subplots(figsize=(4, 4))
     plt.subplots_adjust(left=0)  # remove margin
+    # Define the upper and lower bounds for axes
+    y_ub = 6
+    y_lb = -y_ub
+    x_ub = 3
+    x_lb = -x_ub
 
-    # Sample data
+    ### SAMPLE DATA
     ax.scatter(
         data_custom["x"][:, 1],
         data_custom["y"],
         # label="Custom Data",
         color=thm.cols_set1_plt[1],
-        alpha=0.5,
+        alpha=0.9,
+        zorder=10,
+        edgecolors="none",
     )
 
-    include_pop = False
-    if include_pop:
-        # True pop line
-        x_values = np.linspace(-10, 10, 100)
-        y_values = b0 + b1 * x_values
-        if b1 >= 0:
-            label = rf"$\bar{{y}} = {b0:.2f} + {b1:.2f}x$"
-        else:
-            label = rf"$\hat{{y}} = {b0:.2f} - {-b1:.2f}x$"
-
-        ax.plot(
-            x_values,
-            y_values,
-            label=label,
-            color=thm.cols_set1_plt[1],
-        )
-
-    # Sample line
+    ### REG LINE
+    # Regression line
     b0_s = data_custom["model"].params[0]
     b1_s = data_custom["model"].params[1]
 
     if b1_s >= 0:
-        label_s = rf"$\hat{{y}} = {b0_s:.2f} + {b1_s:.2f}x$"
+        label_s = rf"$\hat{{y}}_i = {b0_s:.2f} + {b1_s:.2f}x_i$"
     else:
-        label_s = rf"$\hat{{y}} = {b0_s:.2f} - {-b1_s:.2f}x$"
+        label_s = rf"$\hat{{y}}_i = {b0_s:.2f} - {-b1_s:.2f}x_i$"
 
     ax.plot(
         data_custom["x"][:, 1],
         data_custom["y_hat"],
         label=label_s,
         color=thm.cols_set1_plt[4],
+        zorder=9,
     )
 
-    sorted_indices = np.argsort(data_custom["x"][:, 1])
-    sorted_x = data_custom["x"][:, 1][sorted_indices]
-    sorted_ci_lower = data_custom["ci"][:, 0][sorted_indices]
-    sorted_ci_upper = data_custom["ci"][:, 1][sorted_indices]
+    ### REG RESIDUALS (for residual sum of squares)
+    has_lab_res = False
+    for xi, yi, yhati in zip(
+        data_custom["x"][:, 1], data_custom["y"], data_custom["y_hat"]
+    ):
+        if not has_lab_res:
+            lab_res = r"$y_i - \hat{y_i}$"
+            has_lab_res = True
+        else:
+            lab_res = None  # No label for other lines
 
-    ax.fill_between(
-        sorted_x,
-        sorted_ci_lower,
-        sorted_ci_upper,
-        color=thm.cols_set1_plt[4],
-        alpha=0.3,
-        label="95% Confidence Interval",
+        plt.plot(
+            [xi, xi],
+            [yi, yhati],
+            color=thm.cols_set1_plt[4],
+            linestyle="--",
+            alpha=0.9,
+            label=lab_res,
+        )
+
+    ### Y BAR
+    # Calculate mean of Y
+    y_mean = np.mean(data_custom["y"])
+
+    # Add a horizontal line for y-bar
+    plt.axhline(
+        y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=1.5
     )
 
-    plt.xlim([-11, 11])
-    plt.ylim([-50, 50])
+    # Create standard y-ticks between y_lb and y_ub
+    y_ticks = list(range(y_lb, y_ub + 1, 2))
+
+    # If y_mean is not within the standard y_ticks, add a tick mark and label for y_bar
+    if y_mean not in y_ticks:
+        # Add y_bar label slightly above or below the y_mean position and a small positive offset from the left boundary
+        y_offset = 0.3 if b1_s > 0 else -0.38
+        plt.text(
+            x_lb + 0.1,
+            y_mean + y_offset,
+            r"$\bar{y}=$" + f"{y_mean:.2f}",
+            color="green",
+            verticalalignment="center",
+        )
+
+    # Assign the customized y-ticks
+    plt.gca().set_yticks(y_ticks)
+
+    # Customize y-tick labels to indicate y-bar. The label for y_bar is placed inside the plot
+    # using the above logic, so we don't need to label it on the y-axis anymore.
+    y_tick_labels = [str(int(yt)) for yt in y_ticks]
+    plt.gca().set_yticklabels(y_tick_labels)
+
+    ### DEVIATIONS FROM THE MEAN (for total sum of squares)
+    has_lab_mean = False
+    # Add horizontal lines from each data point to the mean of Y (Total Sum of Squares)
+    for xi, yi in zip(data_custom["x"][:, 1], data_custom["y"]):
+        if not has_lab_mean:
+            lab_mean = r"$y_i - \bar{y}$"
+            has_lab_mean = True
+        else:
+            lab_mean = None  # No label for other lines
+
+        plt.plot(
+            [xi, xi],
+            [yi, y_mean],
+            color=thm.cols_set1_plt[2],
+            linestyle=":",
+            alpha=0.9,
+            label=lab_mean,
+        )
+
+    plt.xlim([x_lb, x_ub])
+    plt.ylim([y_lb, y_ub])
     plt.xlabel("X", fontweight="bold")
     plt.ylabel("Y", fontweight="bold")
     ax.yaxis.set_label_coords(-0.08, 0.5)
-    plt.legend(loc="upper left", fontsize="small")
+
+    legend_loc = "upper left" if b1_s >= 0 else "lower left"
+    plt.legend(loc=legend_loc, fontsize="small")
+    plt.legend(fontsize="small")
+
+    # plt.legend(loc="upper left", fontsize="small")
 
     return fig
 
-
-def create_summary(data):
-    coefficients = pd.DataFrame(
-        {
-            "Coefficient": [r"Intercept", "Slope"],
-            "Population Parameters": [b0_cust, b1_cust],
-            "Sample Estimates": [
-                data["model"].params[0],
-                data["model"].params[1],
-            ],
-            "Standard Errors": [
-                data["model"].bse[0],
-                data["model"].bse[1],
-            ],
-        }
-    )
-
-    # Apply formatting to the "True Pop" and "Estimate" columns
-    coefficients[
-        ["Population Parameters", "Sample Estimates", "Standard Errors"]
-    ] = coefficients[
-        ["Population Parameters", "Sample Estimates", "Standard Errors"]
-    ].applymap(
-        lambda x: f"{x:.2f}"
-    )
-
-    return coefficients
-
-
-with slider_col:
-    if st.button("Resample data", type="primary"):
-        random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(
-            b0_cust, b1_cust, var_cust, n_cust, random_seed
-        )
-
-
-coefficients = create_summary(custom_data)
 
 with chart_col:
     chart_col.pyplot(
@@ -258,55 +266,52 @@ with chart_col:
     )
 
 
-# CSS styles for the table (center and header)
-table_styler = [
-    {
-        "selector": "th",  # Apply to header cells
-        "props": [("background-color", "lightblue")],
-    },
-    {
-        "selector": "td",  # Apply to data cells
-        "props": [
-            ("font-size", "20px"),
-            ("text-align", "center"),
-            ("background-color", "white"),
-        ],
-    },
-]
+def generate_html_table(model):
+    # Extract statistics
+    ess = np.sum(model.resid**2)
+    tss = np.sum((model.model.endog - np.mean(model.model.endog)) ** 2)
+    r2 = model.rsquared
+    likelihood = model.llf
+    aic = model.aic
+    bic = model.bic
+    N = model.nobs
 
-# Apply CSS styles to the DataFrame
-styled_coefficients = coefficients.style.set_table_styles(table_styler)
+    data = [
+        ("R^2", "1 - ESS/TSS", r2),
+        ("Explained Sum of Squares (ESS)", "(y - y_hat)^2", ess),
+        ("Total Sum of Squares (TSS)", "(y - y_bar)^2", tss),
+        ("Likelihood", "Likelihood", likelihood),
+        ("AIC", "AIC", aic),
+        ("BIC", "BIC", bic),
+    ]
 
-# Create a centered and styled HTML representation of the DataFrame
-styled_table = styled_coefficients.hide(axis="index").to_html()
+    html_string = """<table class="table" border="1">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Formula</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>"""
 
-# Define custom CSS to style the table and center it
-table_css = """
-<style>
-    table {
-        margin: 0 auto;
-        text-align: center;
-    }
-</style>
-"""
+    for name, formula, value in data:
+        html_string += (
+            f"<tr><td>{name}</td><td>{formula}</td><td>{value:.2f}</td></tr>"
+        )
+
+    html_string += "</tbody></table>"
+
+    return html_string
+
+
+table_html_string = generate_html_table(custom_data["model"])
 
 s0, c02, s1 = utl.narrow_col()
 
-with slider_col:
-    st.write("")
-    # display table and plot
-    st.write(
-        f"{table_css}{styled_table}",
-        unsafe_allow_html=True,
-    )
-    st.write("")
+with c02:
+    st.markdown(table_html_string, unsafe_allow_html=True)
 
-    st.latex(
-        f"n= {n_cust} ,"
-        + f"R^2 = {custom_data['model'].rsquared:.2f}"
-        + r", \hat{\sigma}"
-        + f"= {custom_data['s']:.2f}"
-    )
 
 s0, c03, s1 = utl.wide_col()
 
@@ -402,7 +407,7 @@ with c03:
 s0, c04, s1 = utl.wide_col()
 
 with c04:
-    st.header("4. Theory with Code")
+    st.header("4. Theory with code")
 
     def tabs_code_theory():
         return st.tabs(["Theory", "Code numpy", "Code statsmodels"])
@@ -568,6 +573,12 @@ s0, c05, s1 = utl.wide_col()
 with c05:
     st.header("5. Proofs to remember")
     sst_proof = "https://stats.stackexchange.com/questions/207841/why-is-sst-sse-ssr-one-variable-linear-regression/401299#401299"
+
+    with st.expander(r"$0 \leq R^2 \leq 1$"):
+        st.markdown("TBD")
+
+    with st.expander("R-sq increases with number of regressors"):
+        st.markdown("TBD")
 
     with st.expander("SST = SSR + SSE"):
         st.markdown(

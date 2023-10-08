@@ -54,6 +54,12 @@ with c01:
     st.write(
         r"You then draw a sample of size $n$ from that population and estimate OLS coefficients, $b_0$ and $b_1$."
     )
+    st.latex(
+        r"""
+            y_i = \beta_0 + \beta_1x_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
+        """
+    )
+    st.latex(r"""\hat{y_i} = b_0 + b_1 x_i""")
 
 
 def gen_lin_data(b0, b1, sd, N, rseed):
@@ -81,21 +87,9 @@ def gen_lin_data(b0, b1, sd, N, rseed):
     ci = predictions.conf_int(alpha=0.05)  # 95% CI
     deg_freedom = X.shape[0] - X.shape[1]  # n - K
 
-    # get CI manually - not needed
-    # t_score = t.ppf(0.975, deg_freedom)
-    # ci = np.column_stack(
-    #     (y_hat - t_score * y_hat_se, y_hat + t_score * y_hat_se)
-    # )
-
-    # get error parameters - not needed
+    # get error estimates
     e = y - y_hat
     s = np.sqrt(np.sum(e**2) / deg_freedom)
-
-    # calculate R^2 manually - not needed
-    y_bar = np.mean(y)
-    ss_tot = np.sum((y - y_bar) ** 2)
-    ss_res = np.sum((y - y_hat) ** 2)
-    r_squared = 1 - ss_res / ss_tot
 
     return {
         "y": y,
@@ -110,13 +104,6 @@ def gen_lin_data(b0, b1, sd, N, rseed):
 slider_col, s1, chart_col = st.columns((0.8, 0.1, 1))
 
 with slider_col:
-    st.latex(
-        r"""
-            y_i = \beta_0 + \beta_1x_i + \varepsilon_i \text{, where }  \varepsilon \sim N(0, \sigma^2)
-        """
-    )
-    st.latex(r"""\hat{y_i} = """ + r"""b_0 + b_1 x_i""")
-
     # Sliders
     b0_cust = st.slider(
         r"Intercept, $\beta_0$",
@@ -295,7 +282,7 @@ table_css = """
 
 s0, c02, s1 = utl.narrow_col()
 
-with slider_col:
+with c02:
     st.write("")
     # display table and plot
     st.write(
@@ -368,7 +355,7 @@ with c03:
 s0, c04, s1 = utl.wide_col()
 
 with c04:
-    st.header("4. Theory with Code")
+    st.header("4. Theory with code")
 
     def tabs_code_theory():
         return st.tabs(["Theory", "Code numpy", "Code statsmodels"])
