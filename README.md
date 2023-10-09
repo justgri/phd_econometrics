@@ -1,9 +1,13 @@
-# PhD Level Econometrics with Streamlit
+# PhD for All: Econometrics with Streamlit
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://phd-econometrics.streamlit.app)
 
-Summarizing select topics from PhD level Econometrics course for learning purposes.
+### **Interactive visuals. Rigorous theory. Simple code.**
 
-Topics are chosen arbitrarily and do not represent the official course materials.
+Learning and helping others learn along the way.
+
+Explaining PhD concepts intuitively.
+
+Targeted at **grad students**, but useful for **professionals** and **undergrads** alike.
 
 All errors are my own.
