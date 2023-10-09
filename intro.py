@@ -99,9 +99,7 @@ with c2:
 
     with st.expander("Click to expand"):
         # Page links - potentially hrefs with st.experimental_set_query_params()
-        path_tools = (
-            "https://phd-econometrics.streamlit.app/Tools%20for%20Econometrics"
-        )
+        path_tools = "https://phd-econometrics.streamlit.app/Must-know"
         path_ols = "https://phd-econometrics.streamlit.app/Linear%20Regression"
         path_fit = "https://phd-econometrics.streamlit.app/Fit%20Measures"
 
