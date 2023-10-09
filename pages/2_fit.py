@@ -4,13 +4,14 @@ import sys
 
 import numpy as np
 import pandas as pd
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
+
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -145,6 +146,7 @@ def plot_ols(data_custom, b0, b1):
         alpha=0.9,
         zorder=10,
         edgecolors="none",
+        s=50,
     )
 
     ### REG LINE
@@ -163,6 +165,7 @@ def plot_ols(data_custom, b0, b1):
         label=label_s,
         color=thm.cols_set1_plt[4],
         zorder=9,
+        linewidth=2.5,
     )
 
     ### REG RESIDUALS (for residual sum of squares)
@@ -171,7 +174,7 @@ def plot_ols(data_custom, b0, b1):
         data_custom["x"][:, 1], data_custom["y"], data_custom["y_hat"]
     ):
         if not has_lab_res:
-            lab_res = r"$y_i - \hat{y_i}$"
+            lab_res = r"$y_i - \hat{y_i}$ for RSS"
             has_lab_res = True
         else:
             lab_res = None  # No label for other lines
@@ -183,6 +186,7 @@ def plot_ols(data_custom, b0, b1):
             linestyle="--",
             alpha=0.9,
             label=lab_res,
+            linewidth=2,
         )
 
     ### Y BAR
@@ -190,7 +194,9 @@ def plot_ols(data_custom, b0, b1):
     y_mean = np.mean(data_custom["y"])
 
     # Add a horizontal line for y-bar
-    plt.axhline(y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=1.5)
+    plt.axhline(
+        y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=2.5
+    )
 
     # Create standard y-ticks between y_lb and y_ub
     y_ticks = list(range(y_lb, y_ub + 1, 2))
@@ -198,7 +204,7 @@ def plot_ols(data_custom, b0, b1):
     # If y_mean is not within the standard y_ticks, add a tick mark and label for y_bar
     if y_mean not in y_ticks:
         # Add y_bar label slightly above or below the y_mean position and a small positive offset from the left boundary
-        y_offset = 0.3 if b1_s > 0 else -0.38
+        y_offset = 0.35 if b1_s > 0 else -0.45
         plt.text(
             x_lb + 0.1,
             y_mean + y_offset,
@@ -220,7 +226,7 @@ def plot_ols(data_custom, b0, b1):
     # Add horizontal lines from each data point to the mean of Y (Total Sum of Squares)
     for xi, yi in zip(data_custom["x"][:, 1], data_custom["y"]):
         if not has_lab_mean:
-            lab_mean = r"$y_i - \bar{y}$"
+            lab_mean = r"$y_i - \bar{y}\;$ for TSS"
             has_lab_mean = True
         else:
             lab_mean = None  # No label for other lines
@@ -232,7 +238,22 @@ def plot_ols(data_custom, b0, b1):
             linestyle=":",
             alpha=0.9,
             label=lab_mean,
+            linewidth=2,
         )
+
+    # Add R-sq label
+    r_squared = data_custom["model"].rsquared
+
+    # Add R^2 to the top right corner
+    rsq_offset = 0.1
+    ax.text(
+        x_ub - rsq_offset,
+        y_ub - rsq_offset - 0.1,
+        f"$R^2 = {r_squared:.2f}$",
+        horizontalalignment="right",
+        verticalalignment="top",
+        fontsize=10,
+    )
 
     plt.xlim([x_lb, x_ub])
     plt.ylim([y_lb, y_ub])
@@ -240,17 +261,18 @@ def plot_ols(data_custom, b0, b1):
     plt.ylabel("Y", fontweight="bold")
     ax.yaxis.set_label_coords(-0.08, 0.5)
 
-    # legend_loc = "upper left" if b1_s >= 0 else "lower left"
-    # plt.legend(loc=legend_loc, fontsize="small")
-    plt.legend(fontsize="small")
-
-    # plt.legend(loc="upper left", fontsize="small")
+    legend_loc = (
+        "upper left" if data_custom["y_hat"][0] < 3.25 else "lower left"
+    )
+    plt.legend(loc=legend_loc, fontsize="small")
 
     return fig
 
 
 with chart_col:
-    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
+    chart_col.pyplot(
+        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
+    )
 
 
 def generate_html_table(model):
@@ -283,7 +305,9 @@ def generate_html_table(model):
                     <tbody>"""
 
     for name, formula, value in data:
-        html_string += f"<tr><td>{name}</td><td>{formula}</td><td>{value:.2f}</td></tr>"
+        html_string += (
+            f"<tr><td>{name}</td><td>{formula}</td><td>{value:.2f}</td></tr>"
+        )
 
     html_string += "</tbody></table>"
 
@@ -348,7 +372,9 @@ with c03:
         unsafe_allow_html=True,
     )
 
-    st.markdown(r"""<h5>R-squared does NOT indicate:</h5>""", unsafe_allow_html=True)
+    st.markdown(
+        r"""<h5>R-squared does NOT indicate:</h5>""", unsafe_allow_html=True
+    )
     st.markdown(
         r"""
         1. Causality
@@ -576,7 +602,9 @@ with c05:
             unsafe_allow_html=True,
         )
 
-    with st.expander("Relating two formulations of AIC (Greene pp. 47 and 561)"):
+    with st.expander(
+        "Relating two formulations of AIC (Greene pp. 47 and 561)"
+    ):
         st.markdown(
             r"""
             Not sure if this is useful, but it clarified things in my head.<br>

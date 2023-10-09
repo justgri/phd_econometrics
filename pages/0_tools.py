@@ -1,9 +1,10 @@
 import numpy as np
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 import streamlit as st
 from matplotlib import pyplot as plt
 from st_pages import add_page_title
+
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -21,9 +22,11 @@ s1, c1, s2 = utl.wide_col()
 ### PAGE START ###
 # Dashboard header
 with c1:
-    st.title("Top 10 Tools for Econometrics")
+    st.title("Top 10 Theory Tools for Econometrics")
     st.divider()
-    st.markdown(r"""<h3>According to Jeffrey Wooldridge</h3>""", unsafe_allow_html=True)
+    st.markdown(
+        r"""<h3>According to Jeffrey Wooldridge</h3>""", unsafe_allow_html=True
+    )
 
 
 s1, c2, s2 = utl.wide_col()
@@ -72,7 +75,9 @@ def render_lin_exp():
         # Regression Line (Deterministic Line based on the given a and b)
         x_values = [min(X), max(X)]  # first and last X
         y_values = a + b * np.array(x_values)
-        ax.plot(x_values, y_values, color=thm.set1_orange, label=r"$Y = a + bX$")
+        ax.plot(
+            x_values, y_values, color=thm.set1_orange, label=r"$Y = a + bX$"
+        )
 
         # X BAR line
         E_X = np.mean(X)
@@ -155,11 +160,19 @@ def render_lin_exp():
         st.write("**Choose the following parameters:**")
 
         E_X_slider = st.slider(
-            r"Expectation $E[X]$", min_value=-1.0, max_value=1.0, value=0.5, step=0.1
+            r"Expectation $E[X]$",
+            min_value=-1.0,
+            max_value=1.0,
+            value=0.5,
+            step=0.1,
         )
 
         a_slider = st.slider(
-            r"Intercept $a$", min_value=-2.0, max_value=2.0, value=0.0, step=0.1
+            r"Intercept $a$",
+            min_value=-2.0,
+            max_value=2.0,
+            value=0.0,
+            step=0.1,
         )
         b_slider = st.slider(
             r"Slope $b$", min_value=-2.0, max_value=2.0, value=1.0, step=0.1
@@ -181,14 +194,25 @@ def render_lin_exp():
         else:
             b_str = f"+ {b_slider:.2f}"
 
-        var_X_calc = np.var(X, ddof=0)  # ddof=0 ensures we get the population variance
+        var_X_calc = np.var(
+            X, ddof=0
+        )  # ddof=0 ensures we get the population variance
         var_Y_calc = b_slider**2 * var_X_calc
 
         #         st.markdown(r"""$E[Y] = E[a+bX] = a + bE[X]$""", unsafe_allow_html=True)
         # st.markdown(r"""$Var(Y) = Var(a+bX) = b^2Var(X)$""", unsafe_allow_html=True)
 
-        exp_eqn = rf"$E[Y] = E[a+bX] = a + bE[X] = {a_slider:.2f} {b_str} \times {E_X_slider:.2f} = {a_slider + b_slider * E_X_slider:.2f}$"
-        var_eqn = rf"""$Var(Y) = Var(a+bX) = b^2Var(X) = ({b_slider:.2f})^2Var(X) = {b_slider**2:.2f} \times {var_X_calc:.2f} = {var_Y_calc:.2f}$"""
+        exp_eqn = (
+            rf"$E[Y] = E[a+bX] = a + bE[X] = "
+            + r"a + b \frac{\sum_{i=1}^N X_i}{N} ="
+            + rf"{a_slider:.2f} {b_str} \times {E_X_slider:.2f} = {a_slider + b_slider * E_X_slider:.2f}$"
+        )
+        var_eqn = (
+            rf"""$Var(Y) = Var(a+bX) = b^2Var(X) = ({b_slider:.2f})^2 """
+            + r"\frac{\sum_{i=1}^N(X_i - E[X])^2}{N}"
+            + rf"= {b_slider**2:.2f} \times {var_X_calc:.2f} = {var_Y_calc:.2f}$"
+            ""
+        )
 
         st.markdown(exp_eqn, unsafe_allow_html=True)
         st.markdown(var_eqn, unsafe_allow_html=True)
@@ -312,8 +336,12 @@ with c3:
         unsafe_allow_html=True,
     )
 
-    st.markdown(r"""<h4> Bonus (not Wooldridge)</h4>""", unsafe_allow_html=True)
-    st.markdown(r"""11. **Concepts of Independence**""", unsafe_allow_html=True)
+    st.markdown(
+        r"""<h4> Bonus (not Wooldridge)</h4>""", unsafe_allow_html=True
+    )
+    st.markdown(
+        r"""11. **Concepts of Independence**""", unsafe_allow_html=True
+    )
 
     with st.expander("Click to expand"):
         st.markdown(

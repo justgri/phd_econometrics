@@ -26,14 +26,22 @@ email_url = "mailto:justinas.grigaitis@econ.uzh.ch"
 
 # Intro
 with c1:
-    st.title("Econometrics for PhD Students")
+    # Title iterations
+    # Econometrics for PhD Students
+    # PhD Econometrics for Everyone
+    # PhD Econometrics for All
+    # PhD for All: Econometrics
 
+    st.title("PhD for All: Econometrics")
+
+    # Subheader iterations
     # Intuitive visuals. Rigorous theory. Reproducible code.
     # Intuitive visuals. Rigorous theory. Simple code.
     # Intuitive visuals. Rigorous theory. Easy code.
+    # Interactive visuals. Rigorous theory. Simple code.
 
     st.markdown(
-        '<span style="font-size: 28px; display: block; margin-bottom: 5px;">*Intuitive visuals. Rigorous theory. Simple code.*</span>',
+        '<span style="font-size: 28px; display: block; margin-bottom: 5px;">*Interactive visuals. Rigorous theory. Simple code.*</span>',
         unsafe_allow_html=True,
     )
 
@@ -43,23 +51,18 @@ with c1:
     )
 
     st.markdown(
-        "Trying to learn and enjoy the first year of Econ PhD. <br> Procrastinating productively. <br> All mistakes are my own.",
+        r"""Learning and helping others learn along the way.<br>
+            Explaining PhD concepts intuitively.<br>
+            Procrastinating productively.""",
         unsafe_allow_html=True,
     )
     st.markdown(
-        """<u>**Disclaimer:**</u> <br>
-        This website does not represent the official curriculum taught at my university. <br>
-        My goal is to cover fewer topics in greater depth rather than scratch the surface of many. <br>
-        Visuals are meant to be helpful for **undergraduate students** and **industry professionals** as well. <br>
-        """,
-        # Main difference is matrix algebra and proving everything along the way, which might not always be included here.
-        # Hopefully it will give insights to both PhD students, undergrads, and others.
+        r"""Targeted at **grad students**, but useful for **professionals** and **undergrads** alike.""",
         unsafe_allow_html=True,
     )
-
     st.markdown(
         f"""
-        Please send me corections or suggestions: 
+        Please send me feedback:<br>
     <a href="{linkedin_url}" target="_blank">
         <i class="fab fa-linkedin fa-lg"></i>
     </a>
@@ -73,8 +76,144 @@ with c1:
         unsafe_allow_html=True,
     )
 
+    st.markdown(
+        r"""<u>**Disclaimer:**</u> <br>
+        This website does not represent the official curriculum taught at my university. <br>
+        My goal is to cover fewer topics in greater depth rather than scratch the surface of many. <br>
+        All mistakes are my own.
+        """,
+        # Main difference is matrix algebra and proving everything along the way, which might not always be included here.
+        # Hopefully it will give insights to both PhD students, undergrads, and others.
+        unsafe_allow_html=True,
+    )
+
 
 s1, c2, s2 = utl.wide_col()
+
+# Preliminary ToC
+with c2:
+    st.markdown(
+        "<h3 style='text-align: center'>Table of Contents</h3>",
+        unsafe_allow_html=True,
+    )
+
+    with st.expander("Click to expand"):
+        # Page links - potentially hrefs with st.experimental_set_query_params()
+        path_tools = (
+            "https://phd-econometrics.streamlit.app/Tools%20for%20Econometrics"
+        )
+        path_ols = "https://phd-econometrics.streamlit.app/Linear%20Regression"
+        path_fit = "https://phd-econometrics.streamlit.app/Fit%20Measures"
+
+        st.markdown(
+            r"""
+            Hyperlinks lead to the corresponding pages on this website.""",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f"""[**Top 10 theory tools**]({path_tools})"""
+            + r""" **that everyone should know according to Jeffrey Wooldridge**
+        """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            rf"""
+        <div class="numbered-header">
+            <b>Chapter 1: Finite-Sample Properties of OLS</b><br>
+        </div>
+        
+        <div class="numbered">
+            1. <a href="{path_ols}" target="_blank">OLS estimation</a> (Greene Ch 2 - 3.2)<br>
+            2. <a href="{path_fit}" target="_blank">Fit measures</a> (Greene Ch 3.5 and Ch 5.8) <br>
+            3. Hypothesis testing (Greene Ch 5) <br>
+            4. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
+            5. Functional form (Greene Ch 6.5)<br>
+            6. PCA (Greene Ch 4.9)
+        </div>
+
+        <br>
+
+        <div class="numbered-header">
+            <b>Chapter 2: Large-Sample Theory</b><br>
+        </div>
+
+        <div class="numbered">
+            7. Limit theorems, "delta-method" <br>
+            8. Law of large numbers <br>
+            9. Large sample OLS properties <br>
+        </div>
+
+        <br>
+
+        <div class="numbered-header">
+            <b>Chapter 3: Generalized Method of Moments</b><br>
+        </div>
+
+        <div class="numbered">
+            10. Endogeneity <br>
+            11. Instrumental Variables <br>
+            12. IV-related tests <br>
+            13. GMM properties
+        </div>
+
+        <br>
+        
+        <div class="numbered-header">
+            <b>Chapter 4: Multiple-Equation GMM</b>
+        </div>
+
+        <div class="numbered">
+            14. TBD <br>
+            15. TBD <br>
+        </div>
+
+        <br>
+
+        
+        
+        Next semester - Panel Data, Time Series, Cointegration, and MLE. <br>
+        Bonus data science - causal ML, deep learning, classification algorithms, etc.
+
+        Section headers follow Hayahshi *Econometrics* (1st ed.).<br>
+        Chapters from Greene *Eceonometric Analysis* (8th ed.) given in the parentheses.<br>
+        Subsections are likely to change depending on which topics I find most interesting or challenging.<br>
+
+        """,
+            unsafe_allow_html=True,
+        )
+
+
+with c2:
+    st.markdown(
+        "<h3 style='text-align: center'>What is Econometrics?</h3>",
+        unsafe_allow_html=True,
+    )
+
+    econometrica_public = "https://www.sv.uio.no/econ/om/tall-og-fakta/nobelprisvinnere/ragnar-frisch/published-scientific-work/rf-published-scientific-works/rf1933c.pdf"
+    econometrica_jstor = "https://www.jstor.org/stable/i332704"
+
+    with st.expander("Click to expand"):
+        st.markdown(
+            r"""
+            "\[E\]conometrics is by no means the same as economic statistics.
+            Nor is it identical with what we call general economic theory,
+            although a considerable portion of this theory has a definitely quantitative character.
+            Nor should econometrics be taken as synonomous with the application of mathematics to economics.
+            Experience has shown that each of these three view-points, that of statistics, economic theory, and mathematics, is a necessary, but not by itself a sufficient,
+            condition for a real understanding of the quan- titative relations in modern economic life.
+            **It is the unification of all three that is powerful.
+            And it is this *unification* that constitutes econometrics.**" (emphasis added)
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f"""Frisch, Ragnar. “Editor’s Note.” Econometrica, vol. 1, no. 1, 1933, pp. 1–4. JSTOR, http://www.jstor.org/stable/1912224. Accessed 1 Oct. 2023. (free access [link]({econometrica_public}))""",
+            unsafe_allow_html=True,
+        )
+
 
 # Textbooks
 with c2:
@@ -134,120 +273,4 @@ with c2:
         "Intro to Econometrics with R by Professors at University of Duisburg-Essen",
         "https://www.econometrics-with-r.org/",
         type="secondary",
-    )
-
-with c2:
-    st.markdown(
-        "<h3 style='text-align: center'>What is Econometrics?</h3>",
-        unsafe_allow_html=True,
-    )
-
-    econometrica_public = "https://www.sv.uio.no/econ/om/tall-og-fakta/nobelprisvinnere/ragnar-frisch/published-scientific-work/rf-published-scientific-works/rf1933c.pdf"
-    econometrica_jstor = "https://www.jstor.org/stable/i332704"
-
-    st.markdown(
-        r"""
-        "\[E\]conometrics is by no means the same as economic statistics.
-        Nor is it identical with what we call general economic theory,
-        although a considerable portion of this theory has a definitely quantitative character.
-        Nor should econometrics be taken as synonomous with the application of mathematics to economics.
-        Experience has shown that each of these three view-points, that of statistics, economic theory, and mathematics, is a necessary, but not by itself a sufficient,
-        condition for a real understanding of the quan- titative relations in modern economic life.
-        **It is the unification of all three that is powerful.
-        And it is this *unification* that constitutes econometrics.**" (emphasis added)
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""Frisch, Ragnar. “Editor’s Note.” Econometrica, vol. 1, no. 1, 1933, pp. 1–4. JSTOR, http://www.jstor.org/stable/1912224. Accessed 1 Oct. 2023. (free access [link]({econometrica_public}))""",
-        unsafe_allow_html=True,
-    )
-
-# Preliminary ToC
-
-with c2:
-    st.markdown(
-        "<h3 style='text-align: center'>Tentative Table of Contents</h3>",
-        unsafe_allow_html=True,
-    )
-
-    # Page links - potentially hrefs with st.experimental_set_query_params()
-    path_tools = "https://phd-econometrics.streamlit.app/Tools%20for%20Econometrics"
-    path_ols = "https://phd-econometrics.streamlit.app/OLS%20Estimation"
-    path_fit = "https://phd-econometrics.streamlit.app/Fit%20Measures"
-
-    st.markdown(
-        r"""
-        Section headers follow Hayahshi *Econometrics* (1st ed.).<br>
-        Chapters from Greene *Eceonometric Analysis* (8th ed.) given in the parentheses.<br>
-        Subsections are likely to change depending on which topics I find most interesting or challenging.<br>
-        Hyperlinks lead to the corresponding pages on this website.""",
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""[**Top 10 tools**]({path_tools})"""
-        + r""" **that everyone should know according to Jeffrey Wooldridge**
-    """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        rf"""
-    <div class="numbered-header">
-        <b>Chapter 1: Finite-Sample Properties of OLS</b><br>
-    </div>
-    
-    <div class="numbered">
-        1. <a href="{path_ols}" target="_blank">OLS estimation</a> (Greene Ch 2 - 3.2)<br>
-        2. <a href="{path_fit}" target="_blank">Fit measures</a> (Greene Ch 3.5 and Ch 5.8) <br>
-        3. Hypothesis testing (Greene Ch 5) <br>
-        4. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
-        5. Functional form (Greene Ch 6.5)<br>
-        6. PCA (Greene Ch 4.9)
-    </div>
-
-    <br>
-
-    <div class="numbered-header">
-        <b>Chapter 2: Large-Sample Theory</b><br>
-    </div>
-
-    <div class="numbered">
-        7. Limit theorems, "delta-method" <br>
-        8. Law of large numbers <br>
-        9. Large sample OLS properties <br>
-    </div>
-
-    <br>
-
-    <div class="numbered-header">
-        <b>Chapter 3: Generalized Method of Moments</b><br>
-    </div>
-
-    <div class="numbered">
-        10. Endogeneity <br>
-        11. Instrumental Variables <br>
-        12. IV-related tests <br>
-        13. GMM properties
-    </div>
-
-    <br>
-    
-    <div class="numbered-header">
-        <b>Chapter 4: Multiple-Equation GMM</b>
-    </div>
-
-    <div class="numbered">
-        14. TBD <br>
-        15. TBD <br>
-    </div>
-
-    <br>
-
-    Next semester - Panel Data, Time Series, Cointegration, and MLE. <br>
-    Bonus if time permits (it never does) - Monte Carlo, bootstrapping, gradient descent, causal ML, etc.
-    """,
-        unsafe_allow_html=True,
     )

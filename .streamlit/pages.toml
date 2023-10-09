@@ -5,7 +5,7 @@ icon = "🏠"
 
 [[pages]]
 path = "pages/0_tools.py"
-name = "Tools for Econometrics"
+name = "Must-know"
 icon = "🛠"
 
 [[pages]]
