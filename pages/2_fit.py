@@ -42,7 +42,7 @@ s1, c01, s2 = utl.wide_col()
 with c01:
     st.title("Model fit measures")
     st.divider()
-    st.header("1. Visualizing R squared")
+    st.header("1. Visualizing R-squared")
 
     st.markdown(
         r"""Suppose the true population relationship between $X$ and $y$ is linear and defined by the slider values below.
@@ -55,12 +55,14 @@ def gen_lin_data(b0, b1, sd, N, rseed):
     np.random.seed(rseed)
     # fix X values
     X_fix = [-2, -0.5, 2, 0.5, -1.25, 1.25, 0]
+    # X_pos_ref = [0, 2, 6, 4, 1, 5, 3]
+
     K = 2
     X = np.array(X_fix[:N])
     X = np.column_stack((np.ones(len(X)), X))
 
     # generate  error term
-    eps_fix = np.array([-1 / 2 * sd, sd, -sd, -sd, -sd, 1 / 2 * sd, -sd])
+    eps_fix = np.array([-1 * sd, sd, -sd, -sd, -1 * sd, 1 / 2 * sd, -sd])
     eps = np.array(eps_fix[:N])
     # eps = np.random.normal(0, sd, N)
 
@@ -112,8 +114,8 @@ with slider_col:
     var_cust = st.slider(
         r"Error SD, $\sqrt{var(\varepsilon)} = \sigma$",
         min_value=0.1,
-        max_value=2.0,
-        value=1.0,
+        max_value=3.0,
+        value=2.0,
         step=0.1,
     )
 
@@ -146,7 +148,7 @@ def plot_ols(data_custom, b0, b1):
         alpha=0.9,
         zorder=10,
         edgecolors="none",
-        s=50,
+        s=60,
     )
 
     ### REG LINE
@@ -168,19 +170,36 @@ def plot_ols(data_custom, b0, b1):
         linewidth=2.5,
     )
 
+    ### Y BAR
+    y_mean = np.mean(data_custom["y"])
+    plt.axhline(
+        y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=2.5
+    )
+
+    # Y BAR text
+    y_offset = 0.35 if b1_s > 0 else -0.45
+    ax.text(
+        x_lb + 0.1,
+        y_mean + y_offset,
+        r"$\bar{y}=$" + f"{y_mean:.2f}",
+        color="green",
+        verticalalignment="center",
+    )
+
     ### REG RESIDUALS (for residual sum of squares)
+    res_offset = 0.05
     has_lab_res = False
     for xi, yi, yhati in zip(
         data_custom["x"][:, 1], data_custom["y"], data_custom["y_hat"]
     ):
         if not has_lab_res:
-            lab_res = r"$y_i - \hat{y_i}$ for RSS"
+            lab_res = r"$y_i - \hat{y_i}$ for SSE"
             has_lab_res = True
         else:
             lab_res = None  # No label for other lines
 
         plt.plot(
-            [xi, xi],
+            [xi - res_offset, xi - res_offset],
             [yi, yhati],
             color=thm.cols_set1_plt[4],
             linestyle="--",
@@ -188,38 +207,6 @@ def plot_ols(data_custom, b0, b1):
             label=lab_res,
             linewidth=2,
         )
-
-    ### Y BAR
-    # Calculate mean of Y
-    y_mean = np.mean(data_custom["y"])
-
-    # Add a horizontal line for y-bar
-    plt.axhline(
-        y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=2.5
-    )
-
-    # Create standard y-ticks between y_lb and y_ub
-    y_ticks = list(range(y_lb, y_ub + 1, 2))
-
-    # If y_mean is not within the standard y_ticks, add a tick mark and label for y_bar
-    if y_mean not in y_ticks:
-        # Add y_bar label slightly above or below the y_mean position and a small positive offset from the left boundary
-        y_offset = 0.35 if b1_s > 0 else -0.45
-        plt.text(
-            x_lb + 0.1,
-            y_mean + y_offset,
-            r"$\bar{y}=$" + f"{y_mean:.2f}",
-            color="green",
-            verticalalignment="center",
-        )
-
-    # Assign the customized y-ticks
-    plt.gca().set_yticks(y_ticks)
-
-    # Customize y-tick labels to indicate y-bar. The label for y_bar is placed inside the plot
-    # using the above logic, so we don't need to label it on the y-axis anymore.
-    y_tick_labels = [str(int(yt)) for yt in y_ticks]
-    plt.gca().set_yticklabels(y_tick_labels)
 
     ### DEVIATIONS FROM THE MEAN (for total sum of squares)
     has_lab_mean = False
@@ -232,7 +219,7 @@ def plot_ols(data_custom, b0, b1):
             lab_mean = None  # No label for other lines
 
         plt.plot(
-            [xi, xi],
+            [xi + res_offset, xi + res_offset],
             [yi, y_mean],
             color=thm.cols_set1_plt[2],
             linestyle=":",
@@ -286,8 +273,8 @@ def generate_html_table(model):
     N = model.nobs
 
     data = [
-        ("R^2", "1 - ESS/TSS", r2),
-        ("Explained Sum of Squares (ESS)", "(y - y_hat)^2", ess),
+        ("R-squared", "1 - SSE/TSS", r2),
+        ("Error Sum of Squares (SSE)", "(y - y_hat)^2", ess),
         ("Total Sum of Squares (TSS)", "(y - y_bar)^2", tss),
         # ("Likelihood", "Likelihood", likelihood),
         ("AIC", "AIC", aic),
@@ -583,12 +570,6 @@ with c05:
     st.header("5. Proofs to remember")
     sst_proof = "https://stats.stackexchange.com/questions/207841/why-is-sst-sse-ssr-one-variable-linear-regression/401299#401299"
 
-    with st.expander(r"$0 \leq R^2 \leq 1$"):
-        st.markdown("TBD")
-
-    with st.expander("R-sq increases with the number of regressors"):
-        st.markdown("TBD")
-
     with st.expander("SST = SSR + SSE"):
         st.markdown(
             rf"Proof from Greene Section 3.5 (also see [Stack Exchange]({sst_proof})):<br>"
@@ -622,3 +603,9 @@ with c05:
 """,
             unsafe_allow_html=True,
         )
+
+    with st.expander(r"$0 \leq R^2 \leq 1$"):
+        st.markdown("TBD")
+
+    with st.expander("R-sq increases with the number of regressors"):
+        st.markdown("TBD")
