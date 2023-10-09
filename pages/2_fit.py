@@ -267,34 +267,34 @@ def generate_html_table(model):
     ess = np.sum(model.resid**2)
     tss = np.sum((model.model.endog - np.mean(model.model.endog)) ** 2)
     r2 = model.rsquared
+    r2_adj = model.rsquared_adj
+
     likelihood = model.llf
     aic = model.aic
     bic = model.bic
     N = model.nobs
 
     data = [
-        ("R-squared", "1 - SSE/TSS", r2),
-        ("Error Sum of Squares (SSE)", "(y - y_hat)^2", ess),
-        ("Total Sum of Squares (TSS)", "(y - y_bar)^2", tss),
-        # ("Likelihood", "Likelihood", likelihood),
-        ("AIC", "AIC", aic),
-        ("BIC", "BIC", bic),
+        ("SSE (Error Sum of Squares)", ess),
+        ("TSS (Total Sum of Squares)", tss),
+        ("R-squared", r2),
+        ("Adjusted R-squared", r2_adj),
+        # ("Likelihood", likelihood),
+        # ("AIC", aic),
+        # ("BIC", bic),
     ]
 
     html_string = """<table class="table" border="1">
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Formula</th>
                             <th>Value</th>
                         </tr>
                     </thead>
                     <tbody>"""
 
-    for name, formula, value in data:
-        html_string += (
-            f"<tr><td>{name}</td><td>{formula}</td><td>{value:.2f}</td></tr>"
-        )
+    for name, value in data:
+        html_string += f"<tr><td>{name}</td><td>{value:.2f}</td></tr>"
 
     html_string += "</tbody></table>"
 
@@ -303,10 +303,27 @@ def generate_html_table(model):
 
 table_html_string = generate_html_table(custom_data["model"])
 
-s0, c02, s1 = utl.narrow_col()
+_, formula_col, s1, table_col, _ = st.columns((0.2, 1, 0.1, 1, 0.2))
 
-with c02:
+with table_col:
     st.markdown(table_html_string, unsafe_allow_html=True)
+
+with formula_col:
+    st.markdown(r"""<h5>Calculations</h5>""", unsafe_allow_html=True)
+    st.markdown(
+        r"""
+        $SSE = \sum_{i=1}^n (y_i-\hat{y_i})^2 = \mathbf{e'e}$<br>
+        $TSS = \sum_{i=1}^n (y_i-\bar{y_i})^2 = \mathbf{y'M^0y}$<br>
+        $R^2 = 1 - \frac{SSE}{SST} = 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
+        $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$<br>
+""",
+        unsafe_allow_html=True,
+    )
+_, nb_col, _ = st.columns((0.1, 1, 0.1))
+nb_col.markdown(
+    r"NB: Adjusted R-squared $\bar{R}^2$ is heavily penalized here, because the sample size is very small.",
+    unsafe_allow_html=True,
+)
 
 
 s0, c03, s1 = utl.wide_col()
@@ -352,9 +369,10 @@ with c03:
     st.markdown(r"""<h5>R-squared indicates:</h5>""", unsafe_allow_html=True)
     st.markdown(
         r"""
-    1. "Whether variation in $x$ is a good predictor of variation in $y$" - useful for prediction accuracy (Greene Ch 3.5).<br>
-    2. Proportion of total variation in $y$ that is accounted by variation in $x$ - useful for model comparison (if models are similar).<br>
-    3. Measure of fit - how close the data are to the estimated model - useful to get a sense of over/under fitting.
+    1. "Whether variation in $x$ is a good predictor of variation in $y$" - useful for prediction accuracy (G Ch 3.5)<br>
+    2. Proportion of total variation in $y$ that is accounted by variation in $x$ - useful for model comparison<br>
+        NB: The dependent variable has to be of the same transformation (e.g., linear or log) for comparison.       
+    3. How close the data are to the estimated model - useful to get a sense of over/underfitting
 """,
         unsafe_allow_html=True,
     )
@@ -367,7 +385,9 @@ with c03:
         1. Causality
         2. Unbiasedness of the coefficients
         3. Appropriateness of the model
-        4. Whether OOS predictions are reasonable (e.g., high R^2 doesn't prevent forecasting of negative wages)
+        4. How reasonable OOS predictions are (e.g., high R-sq doesn't prevent forecasting of negative wages)
+
+        NB: In general, **interpretation of the R-squared values is highly dependent on the context**. 
         """,
         unsafe_allow_html=True,
     )
@@ -378,35 +398,26 @@ with c03:
     )
 
     st.markdown(
-        r"""Since R-sq increases by including more regressors, we need a measure that penalizes for adding regressors.<br>
-        It has been argued that the adjusted R-sq doesn't penalize heavily enough, thus AIC and BIC measures have been proposed (Greene p. 47).<br>""",
+        r"""Since R-sq increases by including more regressors, we need a measure that penalizes for adding regressors.
+        It has been argued that the adjusted R-sq doesn't penalize heavily enough, thus AIC and BIC measures have been proposed.(Greene p. 47)<br>""",
         unsafe_allow_html=True,
     )
     st.markdown(
         r"""
         "Choosing a model based on the lowest AIC is logically the same as using $\bar{R}^2$ in the linear model, nonstatistical, albeit widely accepted.
-        The AIC and BIC are information criteria, not fit measures as such." (Greene, p.561)<br>
+        The AIC and BIC are information criteria, not fit measures as such." (Greene, p. 561)<br>
         APC has a direct relationship to $R^2$.<br>
         """,
         unsafe_allow_html=True,
     )
 
-    st.header("3. More details")
-    st.write("Check out the following website: TBD")
-    # st.link_button(
-    #     "OLS Algebra",
-    #     "https://matteocourthoud.github.io/course/metrics/05_ols_algebra/",
-    #     type="primary",
-    # )
-
-
 s0, c04, s1 = utl.wide_col()
 
 with c04:
-    st.header("4. Theory with code")
+    st.header("3. Theory with code")
 
     def tabs_code_theory():
-        return st.tabs(["Theory", "Code numpy", "Code statsmodels"])
+        return st.tabs(["Theory", "Code statsmodels", "Code numpy"])
 
     ### Error sums
     st.markdown(
@@ -438,23 +449,6 @@ with c04:
         )
 
     with f2_c2:
-        ols_code_err = """
-        import numpy as np
-
-        # Sum of squared errors
-        SSE = e.dot(e)
-        
-        # Regression sum of squares
-        y_hat_centered = y_hat - np.mean(y_hat)
-        SSR = y_hat_centered.dot(y_hat_centered)
-
-        # Total sum of squares
-        y_centered = y - np.mean(y)
-        SST = y_centered.dot(y_centered)
-        """
-        st.code(ols_code_err, language="python")
-
-    with f2_c3:
         ols_code_err_b = """
         import statsmodels.api as sm
         model = sm.OLS(y, X).fit()
@@ -470,6 +464,23 @@ with c04:
         """
 
         st.code(ols_code_err_b, language="python")
+
+    with f2_c3:
+        ols_code_err = """
+        import numpy as np
+
+        # Sum of squared errors
+        SSE = e.dot(e)
+        
+        # Regression sum of squares
+        y_hat_centered = y_hat - np.mean(y_hat)
+        SSR = y_hat_centered.dot(y_hat_centered)
+
+        # Total sum of squares
+        y_centered = y - np.mean(y)
+        SST = y_centered.dot(y_centered)
+        """
+        st.code(ols_code_err, language="python")
 
     st.divider()
 
@@ -514,28 +525,6 @@ with c04:
         )
 
     with f3_c2:
-        r2_code = """
-        import numpy as np
-        # R-sq and R-sq adjusted
-        y_centered = y - np.mean(y)
-        r_sq = 1 - e.dot(e) / y_centered.dot(y_centered)
-        r_sq_adj = 1 - ((n - 1) / (n - K)) * (1 - r_sq)
-
-        # Pseudo R-sq
-        var_y = np.var(y)
-        pseudo_r_sq = (-1 * np.log(1 - r_sq) / (1 + np.log(2 * np.pi) + np.log(var_y)))
-                
-        # Amemiya's Prediction Criterion
-        APC = (e.dot(e) / n) * (n + K) / (n - K)
-
-        # AIC and BIC, first get log likelihood
-        ln_L = (-n / 2) * (1 + np.log(2 * np.pi) + np.log(SSE / n))
-        AIC = -2 * ln_L + 2 * K
-        BIC = -2 * ln_L + K * np.log(n)
-        """
-        st.code(r2_code, language="python")
-
-    with f3_c3:
         r2_code_built_in = """
         import statsmodels.api as sm
         import numpy as np
@@ -563,10 +552,38 @@ with c04:
 
         st.code(r2_code_built_in, language="python")
 
-    st.divider()
+    with f3_c3:
+        r2_code = """
+        import numpy as np
+        # R-sq and R-sq adjusted
+        y_centered = y - np.mean(y)
+        r_sq = 1 - e.dot(e) / y_centered.dot(y_centered)
+        r_sq_adj = 1 - ((n - 1) / (n - K)) * (1 - r_sq)
+
+        # Pseudo R-sq
+        var_y = np.var(y)
+        pseudo_r_sq = (-1 * np.log(1 - r_sq) / (1 + np.log(2 * np.pi) + np.log(var_y)))
+                
+        # Amemiya's Prediction Criterion
+        APC = (e.dot(e) / n) * (n + K) / (n - K)
+
+        # AIC and BIC, first get log likelihood
+        ln_L = (-n / 2) * (1 + np.log(2 * np.pi) + np.log(SSE / n))
+        AIC = -2 * ln_L + 2 * K
+        BIC = -2 * ln_L + K * np.log(n)
+        """
+        st.code(r2_code, language="python")
 
 s0, c05, s1 = utl.wide_col()
 with c05:
+    st.header("4. More details")
+    st.write("Check out Andrius Buteikis' book:")
+    st.link_button(
+        "Goodness-of-Fit",
+        "http://web.vu.lt/mif/a.buteikis/wp-content/uploads/PE_Book/3-8-UnivarGoF.html",
+        type="primary",
+    )
+
     st.header("5. Proofs to remember")
     sst_proof = "https://stats.stackexchange.com/questions/207841/why-is-sst-sse-ssr-one-variable-linear-regression/401299#401299"
 

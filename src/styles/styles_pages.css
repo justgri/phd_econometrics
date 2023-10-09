@@ -51,10 +51,12 @@ span.math.math-inline span.katex span.katex-mathml {
 th {
     background-color: lightblue;
     text-align: center;
+    padding: 1px 8px !important;
+    border: 1px solid #ddd !important;
 }
 
-td,
-th {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
+td {
+    /* top/bottom and left/right together */
+    padding: 2px 8px !important;
+    border: 1px solid #ddd !important;
 }

@@ -4,13 +4,14 @@ import sys
 
 import numpy as np
 import pandas as pd
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
+
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -144,24 +145,7 @@ def plot_ols(data_custom, b0, b1):
         alpha=0.5,
     )
 
-    include_pop = False
-    if include_pop:
-        # True pop line
-        x_values = np.linspace(-10, 10, 100)
-        y_values = b0 + b1 * x_values
-        if b1 >= 0:
-            label = rf"$\bar{{y}} = {b0:.2f} + {b1:.2f}x$"
-        else:
-            label = rf"$\hat{{y}} = {b0:.2f} - {-b1:.2f}x$"
-
-        ax.plot(
-            x_values,
-            y_values,
-            label=label,
-            color=thm.cols_set1_plt[1],
-        )
-
-    # Sample line
+    # Fitted line
     b0_s = data_custom["model"].params[0]
     b1_s = data_custom["model"].params[1]
 
@@ -175,6 +159,7 @@ def plot_ols(data_custom, b0, b1):
         data_custom["y_hat"],
         label=label_s,
         color=thm.cols_set1_plt[4],
+        linewidth=2,
     )
 
     sorted_indices = np.argsort(data_custom["x"][:, 1])
@@ -232,13 +217,17 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
+        custom_data = gen_lin_data(
+            b0_cust, b1_cust, var_cust, n_cust, random_seed
+        )
 
 
 coefficients = create_summary(custom_data)
 
 with chart_col:
-    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
+    chart_col.pyplot(
+        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
+    )
 
 
 # CSS styles for the table (center and header)
@@ -323,15 +312,7 @@ with c03:
 
 
 with c03:
-    st.header("2. OLS in matrix notation")
-    st.write("Check out Matteo Courthoud's website for summary:")
-    st.link_button(
-        "OLS Algebra",
-        "https://matteocourthoud.github.io/course/metrics/05_ols_algebra/",
-        type="primary",
-    )
-
-    st.header("3. OLS assumptions")
+    st.header("2. OLS assumptions")
     st.write("Greene Chapter 4, Table 4.1:")
     st.markdown(
         r"""
@@ -348,7 +329,7 @@ with c03:
 s0, c04, s1 = utl.wide_col()
 
 with c04:
-    st.header("4. Theory with code")
+    st.header("3. Theory with code")
 
     def tabs_code_theory():
         return st.tabs(["Theory", "Code numpy", "Code statsmodels"])
@@ -445,8 +426,8 @@ with c04:
         st.markdown(
             r"""
             OLS estimate for $\sigma^2$ aka Standard Error of the Regression (SER):<br>
-            $s^2 \equiv \frac{SSE}{n-K} = \frac{\mathbf{e'e}}{n-K}$<br>
-            $s = \sqrt{s^2} = s$<br>
+            $\hat{\sigma}^2 = s^2 \equiv \frac{SSE}{n-K} = \frac{\mathbf{e'e}}{n-K}$<br>
+            $\hat{\sigma} = \sqrt{s^2} = s$<br>
         
             Conditional variance of $\mathbf{b}$ and standard error of $b_k$:<br>
             $Var(\mathbf{b|X}) = s^2(X'X)^{-1}$<br>
@@ -511,19 +492,31 @@ with c04:
         # Conditional variance and standard errors of beta
         var_b = model.cov_params()
         SE_b = model.bse
+
         """
-
-        st.code(ols_code_err_b, language="python")
-
-        # Prediction confidence intervals - double check
+        # Prediction confidence intervals - need to add
         # predictions = model.get_prediction(X)
         # y_hat_se = predictions.se_mean
         # ci = predictions.conf_int(alpha=0.05)  # 95% CI
+        # st, data, ss2 = summary_table(re, alpha=0.05)
+        # fittedvalues = data[:, 2]
+        # predict_mean_se = data[:, 3]
+        # predict_mean_ci_low, predict_mean_ci_upp = data[:, 4:6].T # which is same as ci
+        # predict_ci_low, predict_ci_upp = data[:, 6:8].T
 
-    st.divider()
+        st.code(ols_code_err_b, language="python")
+
 
 s0, c05, s1 = utl.wide_col()
 with c05:
+    st.header("4. More details")
+    st.write("Check out Matteo Courthoud's website:")
+    st.link_button(
+        "OLS Algebra",
+        "https://matteocourthoud.github.io/course/metrics/05_ols_algebra/",
+        type="primary",
+    )
+
     st.header("5. Proofs to remember")
     sst_proof = "https://stats.stackexchange.com/questions/207841/why-is-sst-sse-ssr-one-variable-linear-regression/401299#401299"
 
