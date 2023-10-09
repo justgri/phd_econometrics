@@ -88,6 +88,12 @@ with c1:
     )
 
 
+_, note_col, _ = st.columns((0.02, 1, 1.5))
+with note_col:
+    with st.expander("For mobile users:"):
+        st.write("Sidebar leads to other pages within this app.")
+        st.image("src/images/intro_mobile_sidebar.png", width=200)
+
 s1, c2, s2 = utl.wide_col()
 
 # Preliminary ToC
