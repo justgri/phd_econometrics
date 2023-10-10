@@ -251,8 +251,8 @@ st.markdown(
 st.markdown(
     r"""
     Consider a random variable $X$ and a random variable $Y = a + bX$, i.e., a linear function of $X$.<br>
-    Move the sliders and observe how $Var(Y)$ does not depend on $E[X]$ and $a$, but only on $b$,
-    whereas $E[Y]$ change linearly based on the combination of all three parameters.
+    Move the sliders and observe how $Var(Y)$ only depends on $b$, but not on $E[X]$ or $a$,
+    whereas $E[Y]$ changes linearly based on the combination of all three parameters.
     Also note that $E[Y]$ does not depend on $b$ if $E[X] = 0$ and vice-versa.""",
     unsafe_allow_html=True,
 )
