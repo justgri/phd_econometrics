@@ -1,10 +1,9 @@
 import numpy as np
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import streamlit as st
 from matplotlib import pyplot as plt
 from st_pages import add_page_title
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -24,9 +23,7 @@ s1, c1, s2 = utl.wide_col()
 with c1:
     st.title("Top 10 Theory Tools for Econometrics")
     st.divider()
-    st.markdown(
-        r"""<h3>According to Jeffrey Wooldridge</h3>""", unsafe_allow_html=True
-    )
+    st.markdown(r"""<h3>According to Jeffrey Wooldridge</h3>""", unsafe_allow_html=True)
 
 
 s1, c2, s2 = utl.wide_col()
@@ -75,9 +72,7 @@ def render_lin_exp():
         # Regression Line (Deterministic Line based on the given a and b)
         x_values = [min(X), max(X)]  # first and last X
         y_values = a + b * np.array(x_values)
-        ax.plot(
-            x_values, y_values, color=thm.set1_orange, label=r"$Y = a + bX$"
-        )
+        ax.plot(x_values, y_values, color=thm.set1_orange, label=r"$Y = a + bX$")
 
         # X BAR line
         E_X = np.mean(X)
@@ -194,9 +189,7 @@ def render_lin_exp():
         else:
             b_str = f"+ {b_slider:.2f}"
 
-        var_X_calc = np.var(
-            X, ddof=0
-        )  # ddof=0 ensures we get the population variance
+        var_X_calc = np.var(X, ddof=0)  # ddof=0 ensures we get the population variance
         var_Y_calc = b_slider**2 * var_X_calc
 
         #         st.markdown(r"""$E[Y] = E[a+bX] = a + bE[X]$""", unsafe_allow_html=True)
@@ -257,7 +250,10 @@ st.markdown(
 
 st.markdown(
     r"""
-    Consider a random variable $X$ and a random variable $Y = a + bX$, i.e., a linear function of $X$.""",
+    Consider a random variable $X$ and a random variable $Y = a + bX$, i.e., a linear function of $X$.<br>
+    Move the sliders and observe how $Var(Y)$ does not depend on $E[X]$ and $a$, but only on $b$,
+    whereas $E[Y]$ change linearly based on the combination of all three parameters.
+    Also note that $E[Y]$ does not depend on $b$ if $E[X] = 0$ and vice-versa.""",
     unsafe_allow_html=True,
 )
 
@@ -336,12 +332,8 @@ with c3:
         unsafe_allow_html=True,
     )
 
-    st.markdown(
-        r"""<h4> Bonus (not Wooldridge)</h4>""", unsafe_allow_html=True
-    )
-    st.markdown(
-        r"""11. **Concepts of Independence**""", unsafe_allow_html=True
-    )
+    st.markdown(r"""<h4> Bonus (not Wooldridge)</h4>""", unsafe_allow_html=True)
+    st.markdown(r"""11. **Concepts of Independence**""", unsafe_allow_html=True)
 
     with st.expander("Click to expand"):
         st.markdown(

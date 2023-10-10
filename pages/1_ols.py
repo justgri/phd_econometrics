@@ -4,14 +4,13 @@ import sys
 
 import numpy as np
 import pandas as pd
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
 from st_pages import add_page_title
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 
@@ -217,17 +216,13 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(
-            b0_cust, b1_cust, var_cust, n_cust, random_seed
-        )
+        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 
 
 coefficients = create_summary(custom_data)
 
 with chart_col:
-    chart_col.pyplot(
-        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
-    )
+    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
 
 
 # CSS styles for the table (center and header)
@@ -348,7 +343,9 @@ with c04:
             $\mathbf{y = X \beta + \varepsilon}$<br>
             <br>
             Let $\mathbf{e \equiv y - Xb}$ and solve for $\mathbf{b}$ that minimizes $\mathbf{e'e}$<br>
-            $\mathbf{b = (X'X)^{-1}X'y}$ solution is the OLS estimate for $\beta$<br>
+            Solution to this minimization problem is:<br>
+            $\mathbf{b = (X'X)^{-1}X'y}$, which we call the OLS estimate for $\beta$<br>
+            And then we can get predicted ("fitted") $y$ values:
             $\mathbf{\hat{y} = X b}$ <br>
             <br>
             $\mathbf{P_{n \times n} \equiv X(X'X)^{-1}X'}$ is the "projection" or "hat" matrix<br>
