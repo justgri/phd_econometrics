@@ -278,3 +278,9 @@ with c2:
         "https://www.econometrics-with-r.org/",
         type="secondary",
     )
+
+    st.link_button(
+        "Intro to Econometrics with R by Professors at SciencesPo - more focus on practicala examples and intuition",
+        "https://scpoecon.github.io/ScPoEconometrics/index.html",
+        type="secondary",
+    )
