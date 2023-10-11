@@ -280,7 +280,7 @@ with c2:
     )
 
     st.link_button(
-        "Intro to Econometrics with R by Professors at SciencesPo - more focus on practicala examples and intuition",
+        "Intro to Econometrics with R by Professors at SciencesPo - more focus on practical examples and intuition",
         "https://scpoecon.github.io/ScPoEconometrics/index.html",
         type="secondary",
     )
