@@ -13,7 +13,6 @@ from scipy.stats import t
 from st_pages import add_page_title
 
 ### PAGE CONFIGS ###
-
 st.set_page_config(
     page_title="PhD Econometrics - Fit",
     page_icon="📈",
@@ -23,6 +22,23 @@ st.set_page_config(
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0
+
+
+def add_sidebar():
+    st.sidebar.title("Navigation")
+    # Using object notation
+    add_selectbox = st.sidebar.selectbox(
+        "How would you like to be contacted?", ("Email", "Home phone", "Mobile phone")
+    )
+
+    # Using "with" notation
+    with st.sidebar:
+        add_radio = st.radio(
+            "Choose a shipping method", ("Standard (5-15 days)", "Express (2-5 days)")
+        )
+
+
+add_sidebar()
 
 ## Data viz part
 # How R-sq is calculated

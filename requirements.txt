@@ -1,8 +1,13 @@
+os
+random
+sys
+time
 numpy
 pandas
 plotly
+statsmodels
 streamlit>=1.27.2
 matplotlib
 scikit-learn
+scipy
 st_pages>=0.4.5
-statsmodels
