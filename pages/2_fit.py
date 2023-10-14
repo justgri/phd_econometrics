@@ -23,23 +23,6 @@ utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0
 
-
-def add_sidebar():
-    st.sidebar.title("Navigation")
-    # Using object notation
-    add_selectbox = st.sidebar.selectbox(
-        "How would you like to be contacted?", ("Email", "Home phone", "Mobile phone")
-    )
-
-    # Using "with" notation
-    with st.sidebar:
-        add_radio = st.radio(
-            "Choose a shipping method", ("Standard (5-15 days)", "Express (2-5 days)")
-        )
-
-
-add_sidebar()
-
 ## Data viz part
 # How R-sq is calculated
 # How R-sq and other measures depend on sample size, error variance, and true parameters
