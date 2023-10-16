@@ -5,3 +5,4 @@ backup/
 **/backup/
 __pycache__/
 **/__pycache__/
+.history/
