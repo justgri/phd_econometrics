@@ -14,6 +14,11 @@ name = "Linear Regression"
 icon = "📈"
 
 [[pages]]
-path = "pages/2_fit.py"
+path = "pages/2_ols_3d.py"
+name = "OLS in 3D"
+icon = "🔍"
+
+[[pages]]
+path = "pages/3_fit.py"
 name = "Fit Measures"
 icon = "🎯"

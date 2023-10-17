@@ -25,6 +25,7 @@ pio.templates["draft"] = go.layout.Template(
 my_font = "Sans-Serif"
 my_font_color = "black"
 
+
 # Personal template for streamlit charts
 pio.templates["my_streamlit"] = go.layout.Template(
     layout=dict(
@@ -123,10 +124,11 @@ pio.templates["my_streamlit"] = go.layout.Template(
             showline=True,
             linecolor="black",
             linewidth=2,
-            ticks="",
+            # ticks="",
+            ticks="outside",
             tickformat="$,.0f",
             title=dict(
-                standoff=0,
+                standoff=0.05,
                 text="",
                 font=dict(family=my_font, color=my_font_color),
             ),
@@ -141,24 +143,42 @@ pio.templates["my_streamlit"] = go.layout.Template(
     data=dict(
         scatter=[
             go.Scatter(
-                line=dict(width=4),
-                marker=dict(symbol="diamond", size=8),
+                line=dict(width=4.5),
+                marker=dict(symbol="circle", size=10),
                 mode="lines",
                 connectgaps=False,
                 # hovertemplate="%{fullData.name}<br>%{x}:%{y}<extra></extra>",
-                hovertemplate="%{x}<br>%{y}<extra></extra>",
-                xhoverformat="%b %Y",
-                yhoverformat="$,.0f",
+                # hovertemplate="%{x}<br>%{y}<extra></extra>",
+                # xhoverformat="%b %Y",
+                # yhoverformat="$,.0f",
             )
         ]
     ),
 )
 
+# Plotly colors
 cols_g10 = px.colors.qualitative.G10
 cols_set1 = px.colors.qualitative.Set1
 
-cols_set1_plt = cm.Set1.colors
+# Given the order of colors in cols_set1_plt
+color_names = [
+    "red",
+    "blue",
+    "green",
+    "purple",
+    "orange",
+    "yellow",
+    "brown",
+    "pink",
+    "grey",
+]
 
+# Create dictionary using a dictionary comprehension
+cols_set1_px = {color_names[i]: cols_set1[i] for i in range(len(color_names))}
+
+
+# Matplolib colors
+cols_set1_plt = cm.Set1.colors
 set1_red = cols_set1_plt[0]
 set1_blue = cols_set1_plt[1]
 set1_green = cols_set1_plt[2]
