@@ -573,13 +573,14 @@ def plot_ols_plotly(data_custom, beta_true, show="x1"):
     )
 
     # Line for Fitted line for one x
+    name_fitted_2d = "x<sub>1</sub>" if show == "x1" else "x<sub>2</sub>"
     fig.add_trace(
         go.Scatter(
             x=x_range,
             y=y_from_one_x,
             mode="lines",
             line=dict(color=color_one_x),
-            name=f"ŷ = {b0_ols:.2f} + {b1_ols if show=='x1' else b2_ols:.2f}{show}",
+            name=f"ŷ = {b0_ols:.2f} + {b1_ols if show=='x1' else b2_ols:.2f}{name_fitted_2d}",
             hoverinfo="none",
         )
     )
