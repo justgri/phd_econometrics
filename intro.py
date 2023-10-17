@@ -107,6 +107,7 @@ with c2:
         # Page links - potentially hrefs with st.experimental_set_query_params()
         path_tools = "https://phd-econometrics.streamlit.app/Must-know"
         path_ols = "https://phd-econometrics.streamlit.app/Linear%20Regression"
+        path_ols_3d = "https://phd-econometrics.streamlit.app/OLS%20in%203D"
         path_fit = "https://phd-econometrics.streamlit.app/Fit%20Measures"
 
         st.markdown(
@@ -130,11 +131,12 @@ with c2:
         
         <div class="numbered">
             1. <a href="{path_ols}" target="_blank">OLS estimation</a> (Greene Ch 2 - 3.2)<br>
-            2. <a href="{path_fit}" target="_blank">Fit measures</a> (Greene Ch 3.5 and Ch 5.8) <br>
-            3. Hypothesis testing (Greene Ch 5) <br>
+            2. <a href="{path_ols_3d}" target="_blank">OLS visualization in 3D</a> (Greene Ch 2 - 3.2)<br>
+            3. <a href="{path_fit}" target="_blank">Fit measures</a> (Greene Ch 3.5 and Ch 5.8) <br>
             4. Data problems (OVB, measurement error, missing data - Greene Ch. 4.9)<br>
-            5. Functional form (Greene Ch 6.5)<br>
-            6. PCA (Greene Ch 4.9)
+            5. Hypothesis testing (Greene Ch 5) <br>
+            6. Functional form (Greene Ch 6.5)<br>
+            7. PCA (Greene Ch 4.9)
         </div>
 
         <br>
@@ -144,9 +146,9 @@ with c2:
         </div>
 
         <div class="numbered">
-            7. Limit theorems, "delta-method" <br>
-            8. Law of large numbers <br>
-            9. Large sample OLS properties <br>
+            8. Limit theorems, "delta-method" <br>
+            9. Law of large numbers <br>
+            10. Large sample OLS properties <br>
         </div>
 
         <br>
@@ -156,10 +158,10 @@ with c2:
         </div>
 
         <div class="numbered">
-            10. Endogeneity <br>
-            11. Instrumental Variables <br>
-            12. IV-related tests <br>
-            13. GMM properties
+            11. Endogeneity <br>
+            12. Instrumental Variables <br>
+            13. IV-related tests <br>
+            14. GMM properties
         </div>
 
         <br>
@@ -169,8 +171,8 @@ with c2:
         </div>
 
         <div class="numbered">
-            14. TBD <br>
             15. TBD <br>
+            16. TBD <br>
         </div>
 
         <br>
