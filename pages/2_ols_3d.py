@@ -76,7 +76,7 @@ with c01:
         <span style="color:blue">Blue dots</span> are observed sample data points, $(y, X)$.<br>
         <span style="color:green">Green dots</span> are data points with predicted $y$ values, $(\hat{y}, X)$.<br>
         <span style="color:orange">Orange line</span> represents predicted $y$ values for the full range of $x_1$, holding $x_2$ constant at $x_2=0$.<br>
-        <span style="color:purple">Purple line</span> represents predicted $y$ values for the full range of $x_2$, holding $x_1$ constant at $x_1=0$.<br>.<br>
+        <span style="color:purple">Purple line</span> represents predicted $y$ values for the full range of $x_2$, holding $x_1$ constant at $x_1=0$.<br>
         """,
         unsafe_allow_html=True,
     )
