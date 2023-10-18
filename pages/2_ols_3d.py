@@ -54,7 +54,7 @@ with c01:
 
     st.markdown(
         r"""Suppose the true population relationship between $X$ and $y$ is defined by the slider values below.
-        You then draw a sample of size $n$ from that population and estimate OLS coefficients, $b_0$, $b_1$, $b_2$.<br>
+        You then draw a sample of size $n$ from that population and estimate OLS coefficients: $b_0$, $b_1$, and $b_2$.<br>
         In the population, $x_{k, i}$'s are i.i.d. with $x_k$ $\sim U(-5, 5)$ for $k=1,2$. Errors are homoscedastic, $\varepsilon \sim N(0, \sigma^2)$.
         """,
         unsafe_allow_html=True,

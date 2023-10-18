@@ -4,7 +4,7 @@
 
 ### *Interactive visuals. Rigorous theory. Simple code.*
 
-Learning and helping others learn along the way.
+Learning Econometrics and helping others learn along the way.
 
 Explaining PhD concepts intuitively.
 

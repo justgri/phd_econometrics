@@ -15,8 +15,6 @@ utl.external_css(
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
 )
 
-show_pages_from_config()
-
 s1, c1, c2 = utl.wide_col()
 
 # my LinkedIn, GitHub, and email
@@ -83,7 +81,6 @@ with c1:
         All mistakes are my own.
         """,
         # Main difference is matrix algebra and proving everything along the way, which might not always be included here.
-        # Hopefully it will give insights to both PhD students, undergrads, and others.
         unsafe_allow_html=True,
     )
 
@@ -286,3 +283,6 @@ with c2:
         "https://scpoecon.github.io/ScPoEconometrics/index.html",
         type="secondary",
     )
+
+
+show_pages_from_config()
