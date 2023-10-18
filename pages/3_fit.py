@@ -20,8 +20,6 @@ st.set_page_config(
     layout="wide",
 )
 
-show_pages_from_config()
-
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0
@@ -627,3 +625,5 @@ with c05:
 
     # with st.expander("R-sq increases with the number of regressors"):
     #     st.markdown("TBD")
+
+show_pages_from_config()

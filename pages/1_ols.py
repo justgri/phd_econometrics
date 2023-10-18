@@ -21,8 +21,6 @@ st.set_page_config(
     layout="wide",
 )
 
-show_pages_from_config()
-
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0
@@ -547,3 +545,5 @@ with c05:
             """,
             unsafe_allow_html=True,
         )
+
+show_pages_from_config()
