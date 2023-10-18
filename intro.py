@@ -10,6 +10,8 @@ st.set_page_config(
     layout="wide",
 )
 
+show_pages_from_config()
+
 utl.local_css("src/styles/styles_home.css")
 utl.external_css(
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"

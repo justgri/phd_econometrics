@@ -8,7 +8,7 @@ import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
-from st_pages import add_page_title
+from st_pages import show_pages_from_config
 
 import src.scripts.plot_themes as thm
 import src.scripts.utils as utl
@@ -20,6 +20,9 @@ st.set_page_config(
     page_icon="📈",
     layout="wide",
 )
+
+show_pages_from_config()
+
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0

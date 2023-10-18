@@ -4,13 +4,14 @@ import sys
 
 import numpy as np
 import pandas as pd
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
-from st_pages import add_page_title
+from st_pages import show_pages_from_config
+
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 st.set_page_config(
@@ -18,6 +19,8 @@ st.set_page_config(
     page_icon="📈",
     layout="wide",
 )
+
+show_pages_from_config()
 
 utl.local_css("src/styles/styles_pages.css")
 
@@ -170,7 +173,9 @@ def plot_ols(data_custom, b0, b1):
 
     ### Y BAR
     y_mean = np.mean(data_custom["y"])
-    plt.axhline(y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=2.5)
+    plt.axhline(
+        y=y_mean, color=thm.cols_set1_plt[2], linestyle="-", linewidth=2.5
+    )
 
     # Y BAR text
     y_offset = 0.35 if b1_s > 0 else -0.45
@@ -244,14 +249,18 @@ def plot_ols(data_custom, b0, b1):
     plt.ylabel("Y", fontweight="bold")
     ax.yaxis.set_label_coords(-0.08, 0.5)
 
-    legend_loc = "upper left" if data_custom["y_hat"][0] < 3.25 else "lower left"
+    legend_loc = (
+        "upper left" if data_custom["y_hat"][0] < 3.25 else "lower left"
+    )
     plt.legend(loc=legend_loc, fontsize="small")
 
     return fig
 
 
 with chart_col:
-    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
+    chart_col.pyplot(
+        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
+    )
 
 
 def generate_html_table(model):
@@ -369,7 +378,9 @@ with c03:
         unsafe_allow_html=True,
     )
 
-    st.markdown(r"""<h5>R-squared does NOT indicate:</h5>""", unsafe_allow_html=True)
+    st.markdown(
+        r"""<h5>R-squared does NOT indicate:</h5>""", unsafe_allow_html=True
+    )
     st.markdown(
         r"""
         1. Causality
@@ -590,7 +601,9 @@ with c05:
             unsafe_allow_html=True,
         )
 
-    with st.expander("Relating two formulations of AIC (Greene pp. 47 and 561)"):
+    with st.expander(
+        "Relating two formulations of AIC (Greene pp. 47 and 561)"
+    ):
         st.markdown(
             r"""
             Not sure if this is useful, but it clarified things in my head.<br>
