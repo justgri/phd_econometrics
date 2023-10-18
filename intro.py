@@ -1,5 +1,5 @@
 import streamlit as st
-from st_pages import Page, add_page_title, show_pages_from_config
+from st_pages import show_pages_from_config
 
 import src.scripts.plot_themes
 import src.scripts.utils as utl
