@@ -1,5 +1,5 @@
 import streamlit as st
-from st_pages import show_pages_from_config
+from st_pages import Page, show_pages_from_config
 
 import src.scripts.plot_themes
 import src.scripts.utils as utl
@@ -9,6 +9,9 @@ st.set_page_config(
     page_icon="📈",
     layout="wide",
 )
+
+show_pages_from_config()
+
 
 utl.local_css("src/styles/styles_home.css")
 utl.external_css(
@@ -283,6 +286,3 @@ with c2:
         "https://scpoecon.github.io/ScPoEconometrics/index.html",
         type="secondary",
     )
-
-
-show_pages_from_config()
