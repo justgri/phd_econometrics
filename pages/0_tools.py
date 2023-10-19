@@ -379,5 +379,3 @@ with c3:
         """,
             unsafe_allow_html=True,
         )
-
-show_pages_from_config()

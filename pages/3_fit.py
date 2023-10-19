@@ -625,5 +625,3 @@ with c05:
 
     # with st.expander("R-sq increases with the number of regressors"):
     #     st.markdown("TBD")
-
-show_pages_from_config()

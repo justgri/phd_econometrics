@@ -846,5 +846,3 @@ with c03:
         """,
         unsafe_allow_html=True,
     )
-
-show_pages_from_config()
