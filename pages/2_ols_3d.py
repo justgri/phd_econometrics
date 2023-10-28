@@ -5,12 +5,11 @@ import sys
 import numpy as np
 import plotly.graph_objects as go
 import plotly.io as pio
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from st_pages import show_pages_from_config
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 st.set_page_config(
@@ -209,9 +208,7 @@ def create_3d_plot(data, view_var="x1"):
     indices = list(range(len(data["y"])))
     hover_text_true = [
         f"x<sub>1</sub>: {x:.2f}, x<sub>2</sub>: {y:.2f}, y: {z:.2f}<br>i: {i}"
-        for x, y, z, i in zip(
-            data["X"][:, 1], data["X"][:, 2], data["y"], indices
-        )
+        for x, y, z, i in zip(data["X"][:, 1], data["X"][:, 2], data["y"], indices)
     ]
 
     # Scatter trace for the data
@@ -246,9 +243,7 @@ def create_3d_plot(data, view_var="x1"):
     # Scatter trace for the fitted y-values (y_hat)
     hover_text_fit = [
         f"x<sub>1</sub>: {x:.2f}, x<sub>2</sub>: {y:.2f}, ŷ: {z:.2f}<br>i: {i}"
-        for x, y, z, i in zip(
-            data["X"][:, 1], data["X"][:, 2], data["y"], indices
-        )
+        for x, y, z, i in zip(data["X"][:, 1], data["X"][:, 2], data["y"], indices)
     ]
 
     fig.add_trace(
@@ -257,9 +252,7 @@ def create_3d_plot(data, view_var="x1"):
             y=data["X"][:, 2],
             z=data["y_hat"],
             mode="markers",
-            marker=dict(
-                size=4.5, opacity=0.7, color=thm.cols_set1_px["green"]
-            ),
+            marker=dict(size=4.5, opacity=0.7, color=thm.cols_set1_px["green"]),
             name="y<sub>hat</sub>",
             hovertext=hover_text_fit,
             hoverinfo="text",

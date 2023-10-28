@@ -282,7 +282,13 @@ with c2:
     )
 
     st.link_button(
-        "Intro to Econometrics with R by Professors at SciencesPo - more focus on practical examples and intuition",
+        "Intro to Econometrics with R by Professors at Sciences Po - more focus on practical examples and intuition",
         "https://scpoecon.github.io/ScPoEconometrics/index.html",
+        type="secondary",
+    )
+
+    st.link_button(
+        "Intro to Econometrics with Streamlit by Florian Chávez (coreso.ch)",
+        "https://econometric-illustrations.streamlit.app/",
         type="secondary",
     )
