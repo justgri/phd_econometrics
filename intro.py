@@ -61,6 +61,23 @@ with c1:
         r"""Targeted at **grad students**, but useful for **professionals** and **undergrads** alike.""",
         unsafe_allow_html=True,
     )
+
+    st.markdown("My other Econ PhD apps:")
+
+    but_col1, but_col2, _ = st.columns((1, 1, 2))
+
+    but_col1.link_button(
+        "PhD Macroeconomics",
+        "https://phd-macroeconomics.streamlit.app/",
+        type="secondary",
+    )
+
+    but_col2.link_button(
+        "PhD Microeconomics",
+        "https://phd-microeconomics.streamlit.app/",
+        type="secondary",
+    )
+
     st.markdown(
         f"""
         Please send me feedback:<br>
