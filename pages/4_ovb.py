@@ -13,9 +13,10 @@ import src.scripts.utils as utl
 
 # from st_pages import show_pages_from_config
 
+
 ### PAGE CONFIGS ###
 # st.set_page_config(
-#     page_title="PhD Econometrics - 3D",
+#     page_title="PhD Econometrics - OVB",
 #     page_icon="📈",
 #     layout="wide",
 # )
@@ -31,12 +32,16 @@ if "random_seed" not in st.session_state:
 # Initial text column
 s1, c01, s2 = utl.wide_col()
 # Input beta 0, sigma, n, Choose X
-input_col_x, input_col_sigma, input_col_n, input_col_0 = st.columns(4)
+input_col_b1, input_col_b2, input_col_cov = st.columns(3)
 # Input beta 1 and 2
-input_col_1, input_col_2 = st.columns((0.5, 1))
+# input_col_1, input_col_2 = st.columns((0.5, 1))
+
+s1, c02, s2 = utl.wide_col()
 
 # Chart columns
 chart1_col, chart2_col = st.columns(2)
+chart3_col, chart4_col = st.columns(2)
+
 # Resample data col
 resample_col, _ = st.columns(2)
 # Table and chart columns
@@ -51,55 +56,56 @@ _, table1_col, _, table2_col, _ = st.columns((0.25, 1, 0.01, 0.5, 0.25))
 # Dashboard header
 
 with c01:
-    st.title("OLS in 3-dimensions")
+    st.title("Omitted Variable Bias")
     st.divider()
-    st.header("1. Visualizing OLS in 3D")
+    st.header("Visualizing OVB")
 
     st.markdown(
-        r"""Suppose the true population relationship between $X$ and $y$ is defined by the slider values below.
-        You then draw a sample of size $n$ from that population and estimate OLS coefficients: $b_0$, $b_1$, and $b_2$.<br>
-        In the population, $x_{k, i}$'s are i.i.d. with $x_k$ $\sim U(-5, 5)$ for $k=1,2$. Errors are homoscedastic, $\varepsilon \sim N(0, \sigma^2)$.
+        r"""Suppose $y$ is causally determined by two variables, $x_1$ and $x_2$. However, you do not think $x_2$ is related to $y$ (or you cannot observe it) and thus do not include it in the regression.
+        If $x_1$ and $x_2$ are correlated, omitting $x_2$ from the regression will lead to a biased estimate of the coefficient on $x_1$.
+        The difference between the true $\beta_1$ and expected $\hat{\alpha}_1$ when $x_2$ is omitted is called the *omitted variable bias*.
         """,
         unsafe_allow_html=True,
     )
+
     st.latex(
         r"""
-        y_i = \beta_0 + \beta_1x_{1, i} + \beta_2x_{2, i} + \varepsilon_i \\
-        \hat{y_i} = b_0 + b_1 x_{1, i} + b_2 x_{2, i} \\
-        """
+    \begin{array}{l r}
+        \text{True DGP:} & y_i = \beta_0 + \beta_1 x_{1, i} + \beta_2 x_{2, i} + \varepsilon_i \\
+        \text{Assumed DGP:} & y_i = \alpha_0 + \alpha_1 x_{1, i} + u_i \\  
+        \text{Covariates: } & x_{2, i} = \gamma_1 x_{1, i} + \nu_i \\
+
+        \text{OVB:} & E[\hat{\alpha}_1] - \beta_1 = \beta_2 \frac{cov(x_1, x_2)}{var(x_1)} = \beta_2 \gamma_1 \\
+                
+    \end{array}
+    """
     )
     st.write("")
 
     st.markdown(
-        r"""Given this model, we can plot 4 elements in both 2D and 3D graphs:""",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        r"""
-        <span style="color:blue">Blue dots</span> are observed sample data points, $(y, X)$.<br>
-        <span style="color:green">Green dots</span> are data points with predicted $y$ values, $(\hat{y}, X)$.<br>
-        <span style="color:orange">Orange line</span> represents predicted $y$ values for the full range of $x_1$, holding $x_2$ constant at $x_2=0$.<br>
-        <span style="color:purple">Purple line</span> represents predicted $y$ values for the full range of $x_2$, holding $x_1$ constant at $x_1=0$.<br>
+        r"""We can visualize this bias by comparing the fitted lines from the true and assumed models, and also look at how the OVB depends on the relationship between $x_1$ and $x_2$.
+        Residuals in OVB model are $u_i = \beta_2 x_{2, i} + \varepsilon_i$, so $E[u_i|x_1] \neq 0$ if $cov(x_1, x_2) \neq 0$, which is equivalent of saying that $x_1$ is endogenous.<br>
+        Note that $\varepsilon \sim N(0, \sigma^2)$, where $\sigma=20$. Sample size $n=500$.
         """,
         unsafe_allow_html=True,
     )
-    st.markdown(
-        r"Move the sliders to see how the plots and sample estimates change by varying the population parameters.",
-        unsafe_allow_html=True,
-    )
 
 
-def gen_reg_data(b0, b1, b2, sd, N, rseed):
+def gen_reg_data(b0, b1, b2, sd, N, cov_x1_x2, rseed):
     np.random.seed(rseed)
 
     beta = np.array([b0, b1, b2])
-    # generate X1, X2, and error - max(N-slider) number of samples
-    # keep X vectors separate for plotting
+
     X1 = np.random.uniform(-5, 5, 1000)
-    X2 = np.random.uniform(-5, 5, 1000)
+    alpha = cov_x1_x2
+    sigma_eta = np.sqrt(1 - cov_x1_x2**2)
+    eta = np.random.normal(0, sigma_eta, size=len(X1))
+    X2 = alpha * X1 + eta
+
+    # Generate random noise
     eps = np.random.normal(0, sd, 1000)
 
-    # take first N samples to show
+    # Take first N samples
     X1 = X1[:N]
     X2 = X2[:N]
     eps = eps[:N]
@@ -107,72 +113,75 @@ def gen_reg_data(b0, b1, b2, sd, N, rseed):
     X = np.column_stack((X1, X2))
     X = sm.add_constant(X)
 
+    X_omit_X2 = X[:, [0, 1]]
+
     # Generate y = b0 + b1*X1 + b2*X2 + eps
     y = np.dot(X, beta) + eps
 
     # OLS regression with both X1 and X2
     model = sm.OLS(y, X).fit()
     y_hat = model.predict(X)
-    # confidence intervals
+    # Confidence intervals
     ci = model.get_prediction(X).conf_int(alpha=0.05)
-    # true standard error
+    # True standard error
     s = model.mse_resid**0.5
+
+    # OLS regression with just X1 to show OVB
+    model_ovb = sm.OLS(y, X_omit_X2).fit()
+    y_hat_ovb = model_ovb.predict(X_omit_X2)
+
+    # OLS regression of X2 on X1
+    model_x2_x1 = sm.OLS(X2, X_omit_X2).fit()
+    x2_hat = model_x2_x1.predict(X_omit_X2)
 
     return {
         "y": y,
         "y_hat": y_hat,
+        "y_hat_ovb": y_hat_ovb,
+        "x2_hat": x2_hat,
         "beta": beta,
         "ci": ci,
         "s": s,
         "X": X,
         "model": model,
+        "model_ovb": model_ovb,
+        "model_x2_x1": model_x2_x1,
     }
 
 
 if "reg_data" not in st.session_state:
     st.session_state.reg_data = gen_reg_data(
-        0.0, -3.0, 3.0, 15.0, 200, st.session_state.random_seed
+        0.0, -3.0, 3.0, 15.0, 200, 0.5, st.session_state.random_seed
     )
 
-
-with input_col_x:
-    plot_x = st.radio(
-        "**X perspective to plot**",
-        ("*x1*", "*x2*"),
-        horizontal=True,
-    )
-    plot_x = plot_x[1:-1]
+# with input_col_x:
+#     plot_x = st.radio(
+#         "**X perspective to plot**",
+#         ("*x1*", "*x2*"),
+#         horizontal=True,
+#     )
+#     plot_x = plot_x[1:-1]
+plot_x = "x1"
 
 # Intercept, β0
-b0_cust = input_col_0.number_input(
-    r"$\beta_0$",
-    min_value=-10.0,
-    max_value=10.0,
-    value=0.0,
-    step=1.0,
-)
+# b0_cust = input_col_0.number_input(
+#     r"$\beta_0$",
+#     min_value=-10.0,
+#     max_value=10.0,
+#     value=0.0,
+#     step=1.0,
+# )
+b0_cust = 0
 
 # Error SD, √var(ϵ)=σ
-var_cust = input_col_sigma.number_input(
-    r"$\sigma$",
-    min_value=0.1,
-    max_value=50.0,
-    value=25.0,
-    step=5.0,
-)
+var_cust = 20
 
 # Sample size, n
-n_cust = input_col_n.number_input(
-    "$n$",
-    min_value=10,
-    max_value=1000,
-    value=50,
-    step=50,
-)
+n_cust = 500
 
 
 # Slope for x1, β1
-b1_cust = input_col_1.number_input(
+b1_cust = input_col_b1.number_input(
     r"$\beta_1$",
     min_value=-10.0,
     max_value=10.0,
@@ -181,12 +190,21 @@ b1_cust = input_col_1.number_input(
 )
 
 # Slope for x2, β2
-b2_cust = input_col_2.slider(
+b2_cust = input_col_b2.number_input(
     r"$\beta_2$",
     min_value=-10.0,
     max_value=10.0,
     value=5.0,
     step=1.0,
+)
+
+# Slope for x2, β2
+cov_cust = input_col_cov.number_input(
+    r"$\gamma_1$",
+    min_value=-0.9,
+    max_value=0.9,
+    value=0.5,
+    step=0.1,
 )
 
 st.session_state.reg_data = gen_reg_data(
@@ -195,9 +213,9 @@ st.session_state.reg_data = gen_reg_data(
     b2_cust,
     var_cust,
     n_cust,
+    cov_cust,
     st.session_state.random_seed,
 )
-
 
 # 3D OVB PLOT
 pio.templates.default = "my_streamlit"
@@ -516,15 +534,21 @@ def plot_ols_plotly(data_custom, beta_true, show="x1"):
     b1_ols = data_custom["model"].params[1]
     b2_ols = data_custom["model"].params[2]
 
+    b0_ovb = data_custom["model_ovb"].params[0]
+    b1_ovb = data_custom["model_ovb"].params[1]
+
     indices = list(range(len(data_custom["y"])))
     # Fitted line for one x
     x_range = np.linspace(-5, 5, 10)
     if show == "x1":
         y_from_one_x = b0_ols + b1_ols * x_range
         color_one_x = thm.cols_set1_px["orange"]
+
     elif show == "x2":
         y_from_one_x = b0_ols + b2_ols * x_range
         color_one_x = thm.cols_set1_px["purple"]
+
+    y_ovb = b0_ovb + b1_ovb * x_range
 
     fig = go.Figure()
 
@@ -583,7 +607,18 @@ def plot_ols_plotly(data_custom, beta_true, show="x1"):
             y=y_from_one_x,
             mode="lines",
             line=dict(color=color_one_x),
-            name=f"ŷ = {b0_ols:.2f} + {b1_ols if show=='x1' else b2_ols:.2f}{name_fitted_2d}",
+            name=f"True fit: ŷ = {b0_ols:.2f} + {b1_ols if show=='x1' else b2_ols:.2f}{name_fitted_2d}",
+            hoverinfo="none",
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=x_range,
+            y=y_ovb,
+            mode="lines",
+            line=dict(color="red"),
+            name=f"OVB fit: ŷ = {b0_ovb:.2f} + {b1_ovb if show=='x1' else b1_ovb:.2f}{name_fitted_2d}",
             hoverinfo="none",
         )
     )
@@ -620,7 +655,7 @@ def plot_ols_plotly(data_custom, beta_true, show="x1"):
         yaxis=dict(
             zeroline=False,
             showgrid=False,
-            range=[-100, 100],
+            range=[-70, 70],
             autorange=False,
             title="",  # Empty the title here as we'll add it as an annotation
             # tickvals=list(range(-100, 101, 30)),
@@ -669,6 +704,251 @@ def plot_ols_plotly(data_custom, beta_true, show="x1"):
     return fig
 
 
+def plot_x2_x1_plotly(data_custom, beta_true, show="x1"):
+    # Prepare data
+    b0, b1, b2 = beta_true
+
+    x1 = data_custom["X"][:, 1]
+    x2 = data_custom["X"][:, 2]
+
+    gamma_0 = data_custom["model_x2_x1"].params[0]
+    gamma_1 = data_custom["model_x2_x1"].params[1]
+
+    indices = list(range(len(data_custom["y"])))
+    # Fitted line for one x
+    x_range = np.linspace(-5, 5, 10)
+
+    x2_line = gamma_0 + gamma_1 * x_range
+    x2_hat = data_custom["x2_hat"]
+
+    fig = go.Figure()
+
+    # Scatter for Sample data
+    hover_text_fit = [
+        f"x<sub>1</sub>: {x:.2f}, x<sub>2</sub>: {y:.2f}, ŷ: {z:.2f}<br>i: {i}"
+        for x, y, z, i in zip(
+            data_custom["X"][:, 1],
+            data_custom["X"][:, 2],
+            data_custom["y"],
+            indices,
+        )
+    ]
+
+    fig.add_trace(
+        go.Scatter(
+            x=x1,
+            y=x2,
+            mode="markers",
+            marker=dict(color=thm.cols_set1_px["brown"], opacity=0.5),
+            hoverinfo="text",
+            hovertext=hover_text_fit,
+            name=f"x<sub>2</sub> = {gamma_0:.2f} + {gamma_1:.2f}x<sub>1</sub> + ν",
+        )
+    )
+
+    # Line for Fitted line for one x
+    fig.add_trace(
+        go.Scatter(
+            x=x_range,
+            y=x2_line,
+            mode="lines",
+            line=dict(color=thm.cols_set1_px["brown"]),
+            name=f"x̂<sub>2</sub> = {gamma_0:.2f} + {gamma_1:.2f}x<sub>1</sub>",
+            hoverinfo="none",
+        )
+    )
+
+    # R-squared
+    r_squared = data_custom["model_x2_x1"].rsquared
+
+    # Update layout
+    fig.update_layout(
+        # Paper options
+        margin=dict(autoexpand=True, l=30, r=40, t=25, b=40, pad=0),
+        # Legend
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1.02,
+            xanchor="left",
+            x=0.05,
+            bgcolor="rgba(255, 255, 255, 0.7)",
+        ),
+        # Hover
+        hovermode="closest",
+        # Axes
+        xaxis=dict(
+            zeroline=False,
+            showgrid=False,
+            range=[-5.5, 5.5],
+            autorange=False,
+            title="",  # Empty the title here as we'll add it as an annotation
+            tickvals=[-3, -1, 0, 1, 3],
+            tickfont=dict(size=14),  # font size for tick marks
+            showspikes=False,
+        ),
+        yaxis=dict(
+            zeroline=False,
+            showgrid=False,
+            range=[-5.5, 5.5],
+            autorange=False,
+            title="",  # Empty the title here as we'll add it as an annotation
+            # tickvals=list(range(-100, 101, 30)),
+            tickvals=[-3, -1, 0, 1, 3],
+            tickfont=dict(size=14),  # font size for tick marks
+            tickformat="d",  # format as integers
+            showticklabels=True,
+            showspikes=False,
+        ),
+        # Adding annotations for the axis labels
+        annotations=[
+            dict(
+                xref="paper",
+                yref="paper",
+                x=1,
+                y=-0.1,
+                text=r"x<sub>1</sub>",
+                font=dict(size=20),
+                showarrow=False,
+            ),
+            dict(
+                xref="paper",
+                yref="paper",
+                x=-0.07,
+                y=1,
+                text="x<sub>2</sub>",
+                font=dict(size=20),
+                showarrow=False,
+            ),
+            # The R-squared annotation remains unchanged
+            dict(
+                text=f"R<sup>2</sup> = {r_squared:.2f}",
+                font=dict(size=20),
+                xref="paper",
+                yref="paper",
+                x=0.99,
+                y=0.99,
+                showarrow=False,
+                bgcolor="rgba(255, 255, 255, 0.7)",
+            ),
+        ],
+    )
+
+    color_and_margin(fig)
+
+    return fig
+
+
+def plot_eps_x1_plotly(data_custom, beta_true, show="x1"):
+
+    x1 = data_custom["X"][:, 1]
+
+    residuals = data_custom["y"] - (
+        data_custom["model"].params[0] + data_custom["model"].params[1] * x1
+    )
+
+    indices = list(range(len(data_custom["y"])))
+
+    # Fitted line for one x
+    x1_with_const = sm.add_constant(x1)
+    model_residuals_on_x1 = sm.OLS(residuals, x1_with_const).fit()
+
+    x_range = np.linspace(-5, 5, 10)
+
+    fitted_line = model_residuals_on_x1.predict(sm.add_constant(x_range))
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=x1,
+            y=residuals,
+            mode="markers",
+            marker=dict(color=thm.cols_set1_px["pink"], opacity=0.5),
+            hoverinfo="none",
+            name=f"True residuals from OVB model",
+        )
+    )
+
+    # Line for Fitted line for one x
+    fig.add_trace(
+        go.Scatter(
+            x=x_range,
+            y=fitted_line,
+            mode="lines",
+            line=dict(color=thm.cols_set1_px["pink"]),
+            name=f"E[u|x<sub>1</sub>]",
+            hoverinfo="none",
+        )
+    )
+
+    # Update layout
+    fig.update_layout(
+        # Paper options
+        margin=dict(autoexpand=True, l=30, r=40, t=25, b=40, pad=0),
+        # Legend
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1.02,
+            xanchor="left",
+            x=0.05,
+            bgcolor="rgba(255, 255, 255, 0.7)",
+        ),
+        # Hover
+        hovermode="closest",
+        # Axes
+        xaxis=dict(
+            zeroline=False,
+            showgrid=False,
+            range=[-5, 5],
+            autorange=False,
+            title="",  # Empty the title here as we'll add it as an annotation
+            tickvals=[-3, -1, 0, 1, 3],
+            tickfont=dict(size=14),  # font size for tick marks
+            showspikes=False,
+        ),
+        yaxis=dict(
+            zeroline=False,
+            showgrid=False,
+            range=[-60, 60],
+            autorange=False,
+            title="",  # Empty the title here as we'll add it as an annotation
+            # tickvals=list(range(-100, 101, 30)),
+            tickvals=[-40, -20, 0, 20, 40],
+            tickfont=dict(size=14),  # font size for tick marks
+            tickformat="d",  # format as integers
+            showticklabels=True,
+            showspikes=False,
+        ),
+        # Adding annotations for the axis labels
+        annotations=[
+            dict(
+                xref="paper",
+                yref="paper",
+                x=1,
+                y=-0.1,
+                text=r"x<sub>1</sub>",
+                font=dict(size=20),
+                showarrow=False,
+            ),
+            dict(
+                xref="paper",
+                yref="paper",
+                x=-0.07,
+                y=1,
+                text="x<sub>2</sub>",
+                font=dict(size=20),
+                showarrow=False,
+            ),
+        ],
+    )
+
+    color_and_margin(fig)
+
+    return fig
+
+
 with resample_col:
     if st.button("Resample data", type="primary"):
         st.session_state.random_seed = random.randint(0, 10000)
@@ -679,11 +959,32 @@ with resample_col:
             b2_cust,
             var_cust,
             n_cust,
+            cov_cust,
             st.session_state.random_seed,
         )
 
+with c02:
+    b1_ols = st.session_state.reg_data["model"].params[1]
+    b2_ols = st.session_state.reg_data["model"].params[2]
+    b1_ovb = st.session_state.reg_data["model_ovb"].params[1]
+
+    st.markdown(
+        r"Regression coefficients: full model $\hat{\beta}_1$ = "
+        + f"{b1_ols:.2f}; "
+        + r"$\hat{\beta}_2$ = "
+        + f"{b2_ols:.2f}; "
+        + r"OVB model $\hat{\alpha}_1 = $"
+        + f"{b1_ovb:.2f}."
+        + r"<br>Sample OVB bias: $\hat{\alpha_1} - \hat{\beta}_1$ = "
+        + f"{b1_ovb - b1_ols:.2f}",
+        unsafe_allow_html=True,
+    )
+
+
 with chart1_col:
     fig_3d = create_3d_plot(st.session_state.reg_data, view_var=plot_x)
+
+    st.write("#### True DGP and model fit")
 
     st.plotly_chart(fig_3d, theme=None, use_container_width=True)
 
@@ -694,8 +995,44 @@ with chart2_col:
         [b0_cust, b1_cust, b2_cust],
         show=plot_x,
     )
+
+    st.write("#### True vs OVB model fit")
+
     st.plotly_chart(
         fig_2d,
+        theme=None,
+        use_container_width=True,
+    )
+
+with chart3_col:
+    fig_x2_x1 = plot_x2_x1_plotly(
+        st.session_state.reg_data,
+        [b0_cust, b1_cust, b2_cust],
+        show=plot_x,
+    )
+
+    st.markdown(r"#### Covariates relationship")
+
+    st.plotly_chart(
+        fig_x2_x1,
+        theme=None,
+        use_container_width=True,
+    )
+
+
+with chart4_col:
+    fig_ovb_resid = plot_eps_x1_plotly(
+        st.session_state.reg_data,
+        [b0_cust, b1_cust, b2_cust],
+        show=plot_x,
+    )
+
+    st.markdown(
+        r"#### OVB residuals $u_i = \beta_2 x_{2, i} + \varepsilon_i$ plot against $x_1$"
+    )
+
+    st.plotly_chart(
+        fig_ovb_resid,
         theme=None,
         use_container_width=True,
     )
@@ -788,16 +1125,16 @@ def gen_coef_table(true_betas, model):
     return html_string
 
 
-with table1_col:
-    coef_table = gen_coef_table(
-        [b0_cust, b1_cust, b2_cust], st.session_state.reg_data["model"]
-    )
+# with table1_col:
+#     coef_table = gen_coef_table(
+#         [b0_cust, b1_cust, b2_cust], st.session_state.reg_data["model"]
+#     )
 
-    st.markdown(coef_table, unsafe_allow_html=True)
+#     st.markdown(coef_table, unsafe_allow_html=True)
 
-with table2_col:
-    stats_table = gen_stats_table(st.session_state.reg_data["model"])
-    st.markdown(stats_table, unsafe_allow_html=True)
+# with table2_col:
+#     stats_table = gen_stats_table(st.session_state.reg_data["model"])
+#     st.markdown(stats_table, unsafe_allow_html=True)
 
 s0, c03, s1 = utl.wide_col()
 
@@ -808,36 +1145,19 @@ with c03:
         st.markdown(
             r"""
     
-1. Looking from $x_1$ perspective and varying $\beta_2$ will lead to the changes in the vertical spread of green dots.<br>
-    The larger $\beta_2$ is in absolute value, the wider the spread of green dots.
-    Conversely, when $\beta_2=0$, the green dots are close to the orange line.<br>
-    Try holding $\beta_2$ at 0 and varying $\sigma$ or $\beta_1$ - the green dots will stay close to the orange line.<br>
+1. Varying $\beta_2$ shows the sneaky effect of OVB - looking at the 2D chart, one would think that the red line fits data much better.
+    However, the effect of $x_1$ is being falsely attributed to $x_2$.
+    
+2. Varying $\beta_2$ and $cov(x_1, x_2)$ shows how the product of these two statistics determines the size of the bias.
 
-2. Higher $R^2$ means that the green dots are closer to the blue dots, i.e., fitted values are closer to the true sample values.
-It is misleading to think that $R^2$ should be higher when green dots are closer to the orange line when looking from $x_1$ perspective.
-$R^2$ coincidentally happens to be higher when green dots are closer to the orange line only when the blue dots are also close to the orange line, which depends on $\sigma$.<br>
-    Try varying $\sigma$ and $\beta_2$ to see how the two affect $R^2$ separately.
-            
+3. True $\beta_1$ has no effect on the size of the bias.
+
+4. $cov(x_1, x_2)$ has no effect on the true model fit (fitted plane in 3D does not change),
     """,
             unsafe_allow_html=True,
         )
 
-with c03:
-    st.header("2. OLS theory")
-    st.markdown(
-        r"""All theory is described on the previous page of this app.<br>
-        This visualization illustrates an example of OLS with homoscedastic errors (see **A4** below) and independent $x$'s.<br>
-        In the future chapters, we will look how the plots and estimates change when the errors are heteroscedastic or when $x$'s are correlated.""",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        r"""Reminder of the OLS assumptions (from Greene Chapter 4, Table 4.1):<br>
-        **A1. Linearity:** $\mathbf{y = X \beta + \varepsilon}$ <br>
-        **A2. Full rank:** $\mathbf{X}$ is an $ n \times K$ matrix with rank $K$ (full column rank) <br>
-        **A3. Exogeneity of the independent variables:** $E[\varepsilon_i | \mathbf{X}] = 0$ <br>
-        **A4. Homoscedasticity and nonautocrrelation:** $E[\mathbf{\varepsilon \varepsilon'} | \mathbf{X}] = \sigma^2 \mathbf{I}_n$ <br>
-        **A5. Stochastic or nonstochastic data:** $\mathbf{X}$ may be fixed or random.<br>
-        **A6. Normal distribution:** $\varepsilon | \mathbf{X} \sim N(0, \sigma^2 \mathbf{I}_n)$ <br>
-        """,
-        unsafe_allow_html=True,
-    )
+s0, c04, s1 = utl.wide_col()
+
+with c04:
+    st.markdown("## OVB with 3 variables")

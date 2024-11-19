@@ -8,18 +8,20 @@ import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from scipy.stats import t
-from st_pages import show_pages_from_config
 
 import src.scripts.plot_themes as thm
 import src.scripts.utils as utl
 
+# from st_pages import show_pages_from_config
+
+
 ### PAGE CONFIGS ###
 
-st.set_page_config(
-    page_title="PhD Econometrics - OLS",
-    page_icon="📈",
-    layout="wide",
-)
+# st.set_page_config(
+#     page_title="PhD Econometrics - OLS",
+#     page_icon="📈",
+#     layout="wide",
+# )
 
 utl.local_css("src/styles/styles_pages.css")
 
@@ -204,12 +206,10 @@ def create_summary(data):
     )
 
     # Apply formatting to the "True Pop" and "Estimate" columns
-    coefficients[
-        ["Population Parameters", "Sample Estimates", "Standard Errors"]
-    ] = coefficients[
-        ["Population Parameters", "Sample Estimates", "Standard Errors"]
-    ].applymap(
-        lambda x: f"{x:.2f}"
+    coefficients[["Population Parameters", "Sample Estimates", "Standard Errors"]] = (
+        coefficients[
+            ["Population Parameters", "Sample Estimates", "Standard Errors"]
+        ].applymap(lambda x: f"{x:.2f}")
     )
 
     return coefficients
@@ -218,17 +218,13 @@ def create_summary(data):
 with slider_col:
     if st.button("Resample data", type="primary"):
         random_seed = random.randint(0, 10000)
-        custom_data = gen_lin_data(
-            b0_cust, b1_cust, var_cust, n_cust, random_seed
-        )
+        custom_data = gen_lin_data(b0_cust, b1_cust, var_cust, n_cust, random_seed)
 
 
 coefficients = create_summary(custom_data)
 
 with chart_col:
-    chart_col.pyplot(
-        plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True
-    )
+    chart_col.pyplot(plot_ols(custom_data, b0_cust, b1_cust), use_container_width=True)
 
 
 # CSS styles for the table (center and header)
@@ -344,7 +340,7 @@ with c04:
     with f1_c1:
         st.markdown(
             r"""
-            Let $\mathbf{x}_i$ and $\beta$ be $K \times 1$ vectors, and $\mathbf{X}$ be $n \times K$ matrix of $\mathbf{x}_i$<br>
+            Let $\mathbf{x}_i$ and $\beta$ be $K \times 1$ vectors, and $\mathbf{X}$ be $n \times K$ matrix of $\mathbf{x}_i'$<br>
             $y_i = \mathbf{x}_i' \beta + \varepsilon_i, (i = 1, 2, ..., n)$<br>
             $\mathbf{y = X \beta + \varepsilon}$<br>
             <br>

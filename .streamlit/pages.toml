@@ -22,3 +22,15 @@ icon = "🔍"
 path = "pages/3_fit.py"
 name = "Fit Measures"
 icon = "🎯"
+
+[[pages]]
+path = "pages/4_ovb.py"
+name = "Omitted Variables"
+icon = "🤔"
+
+[[pages]]
+path = "pages/5_measurement_error.py"
+name = "Measurement Error"
+icon = "📐"
+
+
