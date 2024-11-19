@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 
-intro_page = st.Page("pages/intro.py", title="Introduction", icon="🏠")
+intro_page = st.Page("pages/home.py", title="Introduction", icon="🏠")
 tools_apge = st.Page("pages/0_tools.py", title="Must-know", icon="🛠")
 ols_page = st.Page("pages/1_ols.py", title="Linear Regression", icon="📈")
 ols3d_page = st.Page("pages/2_ols_3d.py", title="OLS in 3D", icon="🔍")
