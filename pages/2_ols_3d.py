@@ -11,15 +11,6 @@ import streamlit as st
 import src.scripts.plot_themes as thm
 import src.scripts.utils as utl
 
-# from st_pages import show_pages_from_config
-
-### PAGE CONFIGS ###
-# st.set_page_config(
-#     page_title="PhD Econometrics - 3D",
-#     page_icon="📈",
-#     layout="wide",
-# )
-
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0

@@ -5,18 +5,6 @@ from matplotlib import pyplot as plt
 import src.scripts.plot_themes as thm
 import src.scripts.utils as utl
 
-# from st_pages import show_pages_from_config
-# from st_pages import add_page_title, get_nav_from_toml
-
-
-### PAGE CONFIGS ###
-
-# st.set_page_config(
-#     page_title="PhD Econometrics - Top Tools",
-#     page_icon="📈",
-#     layout="wide",
-# )
-
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0

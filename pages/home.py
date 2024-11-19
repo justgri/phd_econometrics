@@ -3,31 +3,6 @@ import streamlit as st
 import src.scripts.plot_themes
 import src.scripts.utils as utl
 
-# from st_pages import Page, show_pages_from_config
-# from st_pages import add_page_title, get_nav_from_toml
-
-
-# nav = [st.Page("intro.py"), st.Page("pages/0_tools.py"), st.Page("pages/1_ols.py")]
-# pg = st.navigation(
-#     [st.Page("intro.py"), st.Page("pages/0_tools.py"), st.Page("pages/1_ols.py")]
-# )
-
-# st.set_page_config(
-#     page_title="PhD Econometrics",
-#     page_icon="📈",
-#     layout="wide",
-# )
-
-
-# intro_page = st.Page("pages/intro.py", title="Introduction", icon="🏠")
-# create_page = st.Page("pages/0_tools.py", title="Must-know", icon="🛠")
-# delete_page = st.Page("pages/1_ols.py", title="Linear Regression", icon="📈")
-
-# pg = st.navigation([intro_page, create_page, delete_page])
-
-# pg.run()
-
-
 utl.local_css("src/styles/styles_home.css")
 utl.external_css(
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"

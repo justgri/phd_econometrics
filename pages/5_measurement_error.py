@@ -12,17 +12,6 @@ from scipy.stats import t
 import src.scripts.plot_themes as thm
 import src.scripts.utils as utl
 
-# from st_pages import show_pages_from_config
-
-
-### PAGE CONFIGS ###
-
-# st.set_page_config(
-#     page_title="PhD Econometrics - Measurement Error",
-#     page_icon="📈",
-#     layout="wide",
-# )
-
 utl.local_css("src/styles/styles_pages.css")
 
 random_seed = 0
