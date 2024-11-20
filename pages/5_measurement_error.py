@@ -69,7 +69,7 @@ with c01:
         In addition, we will see what is the effect of measurement error on the precision of coefficients, comparing $var(\hat{\beta})$ in case when it would have been estimated with and without
         the measurement error.<br>
         Note that $\tilde{\varepsilon}$ can be expressed as $\tilde{\varepsilon} = \varepsilon + \eta$. Also, note that $\beta_0 = 0$ and $\varepsilon \sim N(0, \sigma_\varepsilon^2)$.<br>
-        Vary the parameters below to see the effects of measurement error:""",
+        Vary the parameters above to see the effects of measurement error.""",
         unsafe_allow_html=True,
     )
 
@@ -382,4 +382,202 @@ with c04:
         Note that differently from before, $\tilde{\varepsilon} = \varepsilon - \beta_1 \eta$. Same as before, $\beta_0 = 0$ and $\varepsilon \sim N(0, \sigma_\varepsilon^2)$.<br>
         Vary the parameters below to see the effects of measurement error:""",
         unsafe_allow_html=True,
+    )
+
+
+def gen_reg_data_with_x_error(b0, b1, sd_eps, sd_eta, N, rseed):
+    np.random.seed(rseed)
+
+    # Generate X as a single independent variable
+    X_true = np.random.uniform(-5, 5, 1000)
+    eps = np.random.normal(0, sd_eps, 1000)  # Generate random noise
+
+    # Take the first N samples
+    X_true = X_true[:N]
+    eps = eps[:N]
+
+    # Generate the true y
+    y = b0 + b1 * X_true + eps
+
+    # Introduce measurement error in X to create observed X_tilde
+    eta = np.random.normal(0, sd_eta, N)  # Measurement error in X
+    X_tilde = X_true + eta  # Observed X with measurement error
+
+    # Add a constant to X for regression purposes
+    X_with_error = sm.add_constant(X_tilde)
+    X_true_with_const = sm.add_constant(X_true)
+
+    # OLS regression with observed X_tilde
+    model_with_error = sm.OLS(y, X_with_error).fit()
+    y_hat_with_error = model_with_error.predict(X_with_error)
+
+    predictions_with_me = model_with_error.get_prediction(X_with_error)
+    ci_me = predictions_with_me.conf_int(alpha=0.05)
+
+    # OLS regression with true X (no measurement error) for comparison
+    model_true = sm.OLS(y, X_true_with_const).fit()
+    y_hat_true = model_true.predict(X_true_with_const)
+
+    return {
+        "y_true": y,
+        "X_true": X_true,
+        "X_tilde": X_tilde,
+        "y_hat_with_error": y_hat_with_error,
+        "y_hat_true": y_hat_true,
+        "ci_me": ci_me,
+        "beta": np.array([b0, b1]),
+        "model_with_error": model_with_error,
+        "model_true": model_true,
+    }
+
+
+def plot_ols_x_error(data):
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    b0_true, b1_true = data["model_true"].params
+    b0_obs, b1_obs = data["model_with_error"].params
+
+    # Scatter plot for true X values
+    ax.scatter(
+        data["X_true"],
+        data["y_true"],
+        color=thm.set1_green,
+        alpha=0.5,
+        label=r"True $X$",
+    )
+
+    # Scatter plot for observed X_tilde values with measurement error
+    ax.scatter(
+        data["X_tilde"],
+        data["y_true"],
+        color=thm.set1_blue,
+        alpha=0.5,
+        label=r"Observed $\tilde{X}$",
+    )
+
+    # Fit line for true model
+    sorted_indices = np.argsort(data["X_true"])
+    sorted_x_true = data["X_true"][sorted_indices]
+    sorted_y_hat_true = data["y_hat_true"][sorted_indices]
+
+    ax.plot(
+        sorted_x_true,
+        sorted_y_hat_true,
+        color=thm.set1_green,
+        linewidth=2,
+        label=f"True fit: $\hat{{y}} = {b0_true:.2f} + {b1_true:.2f}x$",
+    )
+
+    # Fit line for observed model with measurement error
+    sorted_x_obs = data["X_tilde"][sorted_indices]
+    sorted_y_hat_with_error = data["y_hat_with_error"][sorted_indices]
+    sorted_ci_lower = data["ci_me"][:, 0][sorted_indices]
+    sorted_ci_upper = data["ci_me"][:, 1][sorted_indices]
+
+    ax.plot(
+        sorted_x_obs,
+        sorted_y_hat_with_error,
+        color=thm.set1_blue,
+        linewidth=2,
+        linestyle="--",
+        label=f"Observed fit: " + r"$\hat{y}$" + f"= {b0_obs:.2f} + {b1_obs:.2f}x$",
+    )
+
+    # ax.fill_between(
+    #     sorted_x_obs,
+    #     sorted_ci_lower,
+    #     sorted_ci_upper,
+    #     color=thm.set1_blue,
+    #     alpha=0.3,
+    #     label="95% Confidence Interval",
+    # )
+
+    plt.xlabel("X", fontweight="bold")
+    plt.ylabel("Y", fontweight="bold")
+    ax.yaxis.set_label_coords(-0.08, 0.5)
+    plt.legend(loc="upper left", fontsize="small")
+    return fig
+
+
+# Monte Carlo analysis function for Streamlit
+def monte_carlo_betas_x_error(b0, b1, sd_eps, sd_eta, N, rseed, num_simulations=100):
+    true_betas = []
+    observed_betas = []
+
+    for i in range(num_simulations):
+        # Generate data and get the slope estimates
+        gen_data = gen_reg_data_with_x_error(b0, b1, sd_eps, sd_eta, N, rseed + i)
+        true_betas.append(gen_data["model_true"].params[1])
+        observed_betas.append(gen_data["model_with_error"].params[1])
+
+    return true_betas, observed_betas
+
+
+def plot_monte_carlo_x_error(betas_true, betas_obs):
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    b1 = b1_cust  # True beta value for reference
+
+    # Overlapping histograms for true beta estimates and observed beta estimates
+    ax.hist(
+        betas_true,
+        color="green",
+        alpha=0.5,
+        edgecolor="black",
+        label="Betas from model without ME",
+    )
+    ax.hist(
+        betas_obs,
+        color="blue",
+        alpha=0.5,
+        edgecolor="black",
+        label="Betas from model with ME",
+    )
+
+    # Vertical line for the true beta value
+    ax.axvline(b1, color="red", linestyle="--", label=f"True beta = {b1:.1f}")
+
+    ax.set_xlabel("Estimated Beta")
+    ax.set_xlim([-1, b1_cust + 2])
+    ax.set_ylabel("Frequency")
+    ax.legend()
+
+    plt.tight_layout()
+    return fig
+
+
+# Generate data and Monte Carlo results for the new scenario
+st.session_state.reg_data_x_error = gen_reg_data_with_x_error(
+    b0_cust,
+    b1_cust,
+    sd_eps_cust,
+    sd_eta_cust,
+    n_cust,
+    st.session_state.random_seed,
+)
+
+mc_true_betas_x, mc_obs_betas_x = monte_carlo_betas_x_error(
+    b0_cust,
+    b1_cust,
+    sd_eps_cust,
+    sd_eta_cust,
+    n_cust,
+    st.session_state.random_seed,
+    num_sim_cust,
+)
+
+# Chart columns
+chart1_col, chart2_col = st.columns(2)
+
+with chart1_col:
+    st.markdown(r"#### Regression with $X$ and $\tilde{X}$")
+    st.pyplot(
+        plot_ols_x_error(st.session_state.reg_data_x_error), use_container_width=True
+    )
+
+with chart2_col:
+    st.markdown(r"#### $\beta$'s from " + f"{num_sim_cust}" + r" draws (X error)")
+    st.pyplot(
+        plot_monte_carlo_x_error(mc_true_betas_x, mc_obs_betas_x),
+        use_container_width=True,
     )
