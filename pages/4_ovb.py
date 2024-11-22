@@ -5,11 +5,10 @@ import sys
 import numpy as np
 import plotly.graph_objects as go
 import plotly.io as pio
-import statsmodels.api as sm
-import streamlit as st
-
 import src.scripts.plot_themes as thm
 import src.scripts.utils as utl
+import statsmodels.api as sm
+import streamlit as st
 
 utl.local_css("src/styles/styles_pages.css")
 
@@ -1147,7 +1146,7 @@ with c03:
             unsafe_allow_html=True,
         )
 
-s0, c04, s1 = utl.wide_col()
+# s0, c04, s1 = utl.wide_col()
 
-with c04:
-    st.markdown("## OVB with 3 variables")
+# with c04:
+#     st.markdown("## OVB with 3 variables")
