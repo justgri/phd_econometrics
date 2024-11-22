@@ -646,7 +646,8 @@ def plot_ols_plotly(data_custom, beta_true, show="x1"):
             showgrid=False,
             range=[-70, 70],
             autorange=False,
-            title="",  # Empty the title here as we'll add it as an annotation
+            title="y",
+            title_font=dict(size=18),
             # tickvals=list(range(-100, 101, 30)),
             tickvals=[-50, 0, 50],
             tickfont=dict(size=14),  # font size for tick marks
@@ -662,15 +663,6 @@ def plot_ols_plotly(data_custom, beta_true, show="x1"):
                 x=1,
                 y=-0.1,
                 text=x_label,
-                font=dict(size=20),
-                showarrow=False,
-            ),
-            dict(
-                xref="paper",
-                yref="paper",
-                x=-0.07,
-                y=1,
-                text="y",
                 font=dict(size=20),
                 showarrow=False,
             ),
@@ -781,7 +773,8 @@ def plot_x2_x1_plotly(data_custom, beta_true, show="x1"):
             showgrid=False,
             range=[-5.5, 5.5],
             autorange=False,
-            title="",  # Empty the title here as we'll add it as an annotation
+            title="x<sub>2</sub>",
+            title_font=dict(size=18),
             # tickvals=list(range(-100, 101, 30)),
             tickvals=[-3, -1, 0, 1, 3],
             tickfont=dict(size=14),  # font size for tick marks
@@ -797,15 +790,6 @@ def plot_x2_x1_plotly(data_custom, beta_true, show="x1"):
                 x=1,
                 y=-0.1,
                 text=r"x<sub>1</sub>",
-                font=dict(size=20),
-                showarrow=False,
-            ),
-            dict(
-                xref="paper",
-                yref="paper",
-                x=-0.07,
-                y=1,
-                text="x<sub>2</sub>",
                 font=dict(size=20),
                 showarrow=False,
             ),
@@ -902,7 +886,8 @@ def plot_eps_x1_plotly(data_custom, beta_true, show="x1"):
             showgrid=False,
             range=[-60, 60],
             autorange=False,
-            title="",  # Empty the title here as we'll add it as an annotation
+            title="u",
+            title_font=dict(size=18),
             # tickvals=list(range(-100, 101, 30)),
             tickvals=[-40, -20, 0, 20, 40],
             tickfont=dict(size=14),  # font size for tick marks
@@ -918,15 +903,6 @@ def plot_eps_x1_plotly(data_custom, beta_true, show="x1"):
                 x=1,
                 y=-0.1,
                 text=r"x<sub>1</sub>",
-                font=dict(size=20),
-                showarrow=False,
-            ),
-            dict(
-                xref="paper",
-                yref="paper",
-                x=-0.07,
-                y=1,
-                text="x<sub>2</sub>",
                 font=dict(size=20),
                 showarrow=False,
             ),
