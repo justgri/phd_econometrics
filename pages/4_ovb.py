@@ -1151,7 +1151,7 @@ with c04:
     st.latex(
         r"""
         \begin{array}{l l}
-            \text{True Salary DGP:} & salary_i = 50000 + \beta_{grade} grade_i + \beta_{econ} econ_i + \beta_{econ\_grade} grade_i \times econ_i + \varepsilon_i \\
+            \text{True Salary DGP:} & salary_i = 50000 + \beta_{grade} grade_i + \beta_{econ} econ_i + \varepsilon_i \\
             \text{True Grade DGP:} & grade_i = 80 + \gamma_{econ} econ_i + \nu_i \\
             \text{Estimated DGP:} & salary_i = \alpha_0 + \alpha_{grade} grade_i + u_i \\
             \text{OVB:} & E[\hat{\alpha}_{grade}] - \beta_{grade} = \beta_{econ} \frac{cov(grade, econ)}{var(grade)} \\        
@@ -1391,7 +1391,7 @@ with c03:
     st.markdown(
         r"OVB: $\hat{\alpha}_{grade} - \hat{\beta}_{grade}$"
         + f" = {alpha_gpa_ovb-beta_gpa_est:.1f}. Using OVB formula: "
-        + r" $\hat{\beta}_{econ} \times \frac{cov(grade, econ)}{var(grade)} = \hat{\beta}_{econ} \times \hat{\gamma}_{econ\_on\_grade}$"
+        + r" $\hat{\beta}_{econ} \frac{cov(grade, econ)}{var(grade)} = \hat{\beta}_{econ} \hat{\gamma}_{econ\_on\_grade}$"
         + f" = {beta_econ_est * gamma_major_gpa:.1f}.",
         unsafe_allow_html=True,
     )
@@ -1402,10 +1402,278 @@ with c03:
         unsafe_allow_html=True,
     )
 
-with c03:
     st.markdown(
         r"""Simpson's Paradox refers to a situation where the aggregate effect has the opposite sign than the within-group effect.
                 This can be viewed as omitting the group variable (and potentially the interaction between group and the variable of interest),
                  which is a relevant factor in the true DGP. In our case, we saw that if $econ$ has a relatively strong effect on $salary$ and $grade$,
-                 while $grade$ has a relatively weak effect on salary, then omitting $econ$ from the regression will give a false sign on the $grade$ effect."""
+                 while $grade$ has a relatively weak effect on salary, then omitting $econ$ from the regression will give a false sign on the $grade$ effect.""",
+        unsafe_allow_html=True,
+    )
+
+s1, c04, s2 = utl.wide_col()
+
+with c04:
+    st.markdown("## OVB with 3 variables")
+
+    st.markdown(
+        r"""You are interested in the same question as above, but you hypothesize that leisure can also be an important variable, which affects both the expected salary and the grades,
+        and also might be influenced by your area of study. We will look what happens when you omit both $econ$ and $leisure$ or just $econ$ variable
+        when estimating the effect of $grade$.
+            """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        r"""Suppose the true DGP (data generating process) is defined through equations below. 
+            """,
+        unsafe_allow_html=True,
+    )
+
+    st.latex(
+        r"""
+        \begin{array}{l l}
+            \text{True Salary DGP:} & salary_i = 50000 + \beta_{grade} grade_i + \beta_{econ} econ_i + \beta_{leis}leis_i + \varepsilon_i \\
+            \text{True Grade DGP:} & grade_i = 80 + \gamma_{econ} econ_i + \gamma_{leis} leis_i + \nu_i \\
+            \text{True Leisure DGP:} & leis_i = 5 + \delta_{econ} econ_i + \eta_i \\     
+            \text{} & \\        
+            \text{Estimated DGP:} & salary_i = \alpha_0 + \alpha_{grade} grade_i + u_i \\
+            \text{OVB:} & E[\hat{\alpha}_{grade}] - \beta_{grade} = \beta_{econ} \frac{cov(grade, econ)}{var(grade)} + \beta_{leis} \frac{cov(grade, leis)}{var(grade)} \\        
+        \end{array}
+        """
+    )
+
+    st.write("True DGP parameters are defined below:")
+
+input_col_b_gr, input_col_b_econ, input_col_b_leis = st.columns(3)
+input_col_g_econ, input_col_g_leis, input_col_d_econ = st.columns(3)
+
+
+beta_grade = input_col_b_gr.number_input(
+    r"$\beta_{grade}$", min_value=0, max_value=4000, value=500, step=250, key="123"
+)
+
+beta_econ = input_col_b_econ.number_input(
+    r"$\beta_{econ}$",
+    min_value=-10000,
+    max_value=70000,
+    value=50000,
+    step=10000,
+    key="124",
+)
+
+beta_leis = input_col_b_leis.number_input(
+    r"$\beta_{leis}$",
+    min_value=-15000,
+    max_value=10000,
+    value=-5000,
+    step=1000,
+)
+
+gamma_econ = input_col_g_econ.number_input(
+    r"$\gamma_{econ}$", min_value=-50, max_value=-10, value=-30, step=5, key="125"
+)
+
+gamma_leis = input_col_g_leis.number_input(
+    r"$\gamma_{leis}$",
+    min_value=-15,
+    max_value=5,
+    value=-5,
+    step=1,
+)
+
+delta_econ = input_col_d_econ.number_input(
+    r"$\delta_{econ}$",
+    min_value=-5,
+    max_value=0,
+    value=-3,
+    step=1,
+)
+
+reg_data_leisure = gen_data(
+    10000,
+    b_maj_salary=beta_econ,
+    b_gpa_salary=beta_grade,
+    b_maj_gpa=gamma_econ,
+    incl_leis=True,
+    b_leis_salary=beta_leis,
+    b_maj_leis=delta_econ,
+    b_leis_gpa=gamma_leis,
+)
+
+s1, c05, s2 = utl.wide_col()
+
+
+model_true = smf.ols(
+    formula="salary ~ gpa + major + leisure", data=reg_data_leisure
+).fit()
+model_summary = model_true.summary().as_text()
+
+with c05:
+    with st.expander(
+        "Model summary when including all relevant variables:", expanded=False
+    ):
+        st.text("Sample estimates when including all relevant variables:")
+        st.code(model_summary, language="plaintext")
+
+
+# def plot_salary_gpa_major_leisure(data, formula="salary ~ gpa + major + leisure"):
+#     # Fit the regression model
+#     model = smf.ols(formula=formula, data=data).fit()
+#     beta_const = model.params["Intercept"]
+#     beta_gpa = model.params["gpa"]
+#     beta_major = model.params["major"]
+
+#     # Generate GPA range
+#     gpa_range = np.linspace(data["gpa"].min(), data["gpa"].max(), 100)
+
+#     # Predict salary for each major group
+#     salary_major_0 = beta_const + beta_gpa * gpa_range  # For major = 0
+#     salary_major_1 = beta_const + beta_gpa * gpa_range + beta_major  # For major = 1
+
+#     # Compute average leisure
+#     avg_leisure = data["leisure"].mean()
+
+#     # Create leisure-based categories
+#     data["leisure_category"] = np.where(
+#         data["leisure"] > avg_leisure, "Above Avg", "Below Avg"
+#     )
+
+#     # Define colors for each combination of major and leisure category
+#     color_map = {
+#         (0, "Below Avg"): "blue",
+#         (0, "Above Avg"): "purple",
+#         (1, "Below Avg"): "orange",
+#         (1, "Above Avg"): "red",
+#     }
+
+#     data["color"] = data.apply(
+#         lambda row: color_map[(row["major"], row["leisure_category"])], axis=1
+#     )
+
+#     # Create figure and axes
+#     fig, ax = plt.subplots(figsize=(10, 6))
+
+#     # Scatter plot with color coding for major and leisure
+#     for (major, leisure_category), group in data.groupby(["major", "leisure_category"]):
+#         label = f"Econ={major}, Leisure={leisure_category}"
+#         ax.scatter(
+#             group["gpa"],
+#             group["salary"],
+#             alpha=0.6,
+#             label=label,
+#             color=color_map[(major, leisure_category)],
+#         )
+
+#     # Plot regression lines
+#     ax.plot(
+#         gpa_range,
+#         salary_major_0,
+#         color="blue",
+#         linewidth=2,
+#         label="Econ=0 Regression Line",
+#     )
+#     ax.plot(
+#         gpa_range,
+#         salary_major_1,
+#         color="orange",
+#         linewidth=2,
+#         label="Econ=1 Regression Line",
+#     )
+
+#     # Add labels, legend, and title
+#     ax.set_xlabel("GPA", fontweight="bold")
+#     ax.set_ylabel("Salary (Thousands USD)", fontweight="bold")
+#     ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x/1000:.0f}k"))
+#     ax.set_title("Salary as a Function of GPA, Major, and Leisure", fontweight="bold")
+#     ax.legend(loc="upper left", fontsize="small")
+#     ax.grid(alpha=0.3)
+
+#     return fig
+
+
+# with c05:
+#     st.pyplot(plot_salary_gpa_major_leisure(reg_data_leisure))
+
+
+with c05:
+    beta_est_const = model_true.params["Intercept"]
+    beta_est_gpa = model_true.params["gpa"]
+    beta_est_major = model_true.params["major"]
+    beta_est_leis = model_true.params["leisure"]
+
+    st.markdown(
+        "Sample estimates:"
+        + r"$\hat{salary}$"
+        + rf"""= {beta_est_const:0f}+ {beta_est_gpa:.0f} x grade + {beta_est_major:.0f} x econ + {beta_est_leis:.0f} x leis"""
+    )
+
+    st.markdown(r"#### Case 1 - only include $grade$")
+    st.latex(
+        r"""
+        \begin{array}{l l}
+            \text{Estimated DGP:} & salary_i = \alpha_0 + \alpha_{grade} grade_i + u_i \\
+            \text{OVB:} & E[\hat{\alpha}_{grade}] - \beta_{grade} = \beta_{econ} \frac{cov(grade, econ)}{var(grade)} + \beta_{leis} \frac{cov(grade, leis)}{var(grade)} \\
+        \end{array}
+        """
+    )
+
+    model_ovb_1 = smf.ols(formula="salary ~ gpa", data=reg_data_leisure).fit()
+
+    alpha_est_gpa = model_ovb_1.params["gpa"]
+
+    st.markdown(
+        "Sample estimate: " + r"$\hat{\alpha}_{grade}$" + f"""= {alpha_est_gpa:.0f}"""
+    )
+
+    model_gpa_major = smf.ols(formula="major ~ gpa", data=reg_data_leisure).fit()
+    gamma_gpa_major = model_gpa_major.params["gpa"]
+    model_gpa_leisure = smf.ols(formula="leisure ~ gpa", data=reg_data_leisure).fit()
+    gamma_gpa_leis = model_gpa_leisure.params["gpa"]
+
+    st.markdown(
+        r"OVB: $\hat{\alpha}_{grade} - \hat{\beta}_{grade}$"
+        + f" = {alpha_est_gpa-beta_est_gpa:.0f}"
+    )
+    st.markdown(
+        r"Using OVB formula: "
+        + r""" $\hat{\beta}_{econ} \frac{cov(grade, econ)}{var(grade)} + \hat{\beta}_{leis} \frac{cov(grade, leis)}{var(grade)} 
+        = \hat{\beta}_{econ} \hat{\gamma}_{econ\_on\_grade} + \hat{\beta}_{leis} \hat{\gamma}_{leis\_on\_grade}$"""
+        + f" = {beta_est_major * gamma_gpa_major + beta_est_leis * gamma_gpa_leis:.0f}.",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(r"#### Case 2 - include $grade$ and $leisure$")
+
+    st.latex(
+        r"""
+        \begin{array}{l l}
+            \text{Estimated DGP:} & salary_i = \alpha_0 + \alpha_{grade} grade_i + \alpha_{leis} leis_i + u_i \\
+            \text{OVB on $grade$:} & E[\hat{\alpha}_{grade}] - \beta_{grade} = \beta_{econ} \frac{cov(grade, econ|leisure)}{var(grade|leisure)}\\
+            \text{OVB on $leis$:} & E[\hat{\alpha}_{leis}] - \beta_{leis} = \beta_{econ} \frac{cov(leisure, econ|grade)}{var(leisure|grade)}\\
+        \end{array}
+        """
+    )
+
+    model_ovb_2 = smf.ols(formula="salary ~ gpa + leisure", data=reg_data_leisure).fit()
+
+    alpha_est_gpa_2 = model_ovb_2.params["gpa"]
+    alpha_est_leisure_2 = model_ovb_2.params["leisure"]
+
+    st.markdown(
+        "Sample estimates: "
+        + r"$\hat{\alpha}_{grade}$"
+        + f"= {alpha_est_gpa_2:.0f}; "
+        + r" $\hat{\alpha}_{leis}$"
+        + f"""= {alpha_est_leisure_2:.0f}
+"""
+    )
+
+    st.markdown(
+        r"OVB on grade: $\hat{\alpha}_{grade} - \hat{\beta}_{grade}$"
+        + f" = {alpha_est_gpa_2-beta_est_gpa:.0f}."
+    )
+
+    st.markdown(
+        r"OVB on leisure: $\hat{\alpha}_{leis} - \hat{\beta}_{leis}$"
+        + f" = {alpha_est_leisure_2-beta_est_leis:.0f}."
     )
