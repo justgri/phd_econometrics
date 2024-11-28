@@ -2,13 +2,18 @@ import os
 import random
 import sys
 
+import matplotlib.ticker as ticker
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import streamlit as st
+from matplotlib import pyplot as plt
+
 import src.scripts.plot_themes as thm
 import src.scripts.utils as utl
-import statsmodels.api as sm
-import streamlit as st
 
 utl.local_css("src/styles/styles_pages.css")
 
@@ -60,10 +65,10 @@ with c01:
     st.latex(
         r"""
     \begin{array}{l r}
-        \text{True DGP:} & y_i = \beta_0 + \beta_1 x_{1, i} + \beta_2 x_{2, i} + \varepsilon_i \\
-        \text{Assumed DGP:} & y_i = \alpha_0 + \alpha_1 x_{1, i} + u_i \\  
-        \text{Covariates: } & x_{2, i} = \gamma_1 x_{1, i} + \nu_i \\
-
+        \text{True $y$ DGP:} & y_i = \beta_0 + \beta_1 x_{1, i} + \beta_2 x_{2, i} + \varepsilon_i \\
+        \text{True $x_2$ DGP: } & x_{2, i} = \gamma_1 x_{1, i} + \nu_i \\
+        \text{Estimated $y$ DGP:} & y_i = \alpha_0 + \alpha_1 x_{1, i} + u_i \\  
+        
         \text{OVB:} & E[\hat{\alpha}_1] - \beta_1 = \beta_2 \frac{cov(x_1, x_2)}{var(x_1)} = \beta_2 \gamma_1 \\
                 
     \end{array}
@@ -1122,7 +1127,285 @@ with c03:
             unsafe_allow_html=True,
         )
 
-# s0, c04, s1 = utl.wide_col()
+s0, c04, s1 = utl.wide_col()
 
-# with c04:
-#     st.markdown("## OVB with 3 variables")
+with c04:
+    st.markdown("## OVB and Simpson's Paradox")
+
+    st.markdown(
+        r"""You are interested in the relationship between anual $salary$, average $grade$ in college, and studying $economics$. You think that higher grades should on average increase
+            your salary, however, studying economics might lead to lower grades. When choosing what to study and how much effort to put in for getting good grades,
+            you want to know what are the effects of each variable on the expected salary, so you collect individual data on alumni salaries, grades, and area of studies,
+            and you will estimate these effects with linear regressions.
+            """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        r"""Suppose the true DGP (data generating process) is defined through equations below. We are interested in seeing what happens when you omit $econ$ variable
+        when estimating the effect of $grade$.
+            """,
+        unsafe_allow_html=True,
+    )
+
+    st.latex(
+        r"""
+        \begin{array}{l l}
+            \text{True Salary DGP:} & salary_i = 50000 + \beta_{grade} grade_i + \beta_{econ} econ_i + \beta_{econ\_grade} grade_i \times econ_i + \varepsilon_i \\
+            \text{True Grade DGP:} & grade_i = 80 + \gamma_{econ} econ_i + \nu_i \\
+            \text{Estimated DGP:} & salary_i = \alpha_0 + \alpha_{grade} grade_i + u_i \\
+            \text{OVB:} & E[\hat{\alpha}_{grade}] - \beta_{grade} = \beta_{econ} \frac{cov(grade, econ)}{var(grade)} \\        
+        \end{array}
+        """
+    )
+
+    # st.latex(
+    #     r"""
+    #     \begin{array}{l l}
+    #         \text{True Salary DGP:} & salary_i = 50000 + \beta_{grade} grade_i + \beta_{econ} econ_i + \beta_{econ\_grade} grade_i \times econ_i + \varepsilon_i \\
+    #         \text{True grade DGP:} & grade_i = 70 + \gamma_{econ} econ_i + \nu_i \\
+    #     \end{array}
+    #     """
+    # )
+
+    st.write("True DGP parameters are defined below:")
+# Input beta 0, sigma, n, Choose X
+input_col_b_gr, input_col_b_econ, input_gamma, input_n = st.columns(4)
+
+beta_grade = input_col_b_gr.number_input(
+    r"$\beta_{grade}$",
+    min_value=0,
+    max_value=4000,
+    value=500,
+    step=250,
+)
+
+beta_econ = input_col_b_econ.number_input(
+    r"$\beta_{econ}$",
+    min_value=-10000,
+    max_value=70000,
+    value=50000,
+    step=10000,
+)
+
+gamma_econ = input_gamma.number_input(
+    r"$\gamma_{econ}$",
+    min_value=-50,
+    max_value=-10,
+    value=-30,
+    step=5,
+)
+
+N = input_n.number_input(
+    r"Sample size, $N$",
+    min_value=50,
+    max_value=20000,
+    value=10000,
+    step=1000,
+)
+
+
+# Generate data
+def gen_data(
+    N,
+    b_maj_salary=10000,
+    b_gpa_salary=2000,
+    b_maj_gpa=-10,
+    incl_leis=False,
+    b_leis_salary=-1000,
+    b_maj_leis=-1000,
+    b_leis_gpa=-3,
+    rseed=12345,
+):
+
+    np.random.seed(rseed)
+
+    major = np.random.choice([0, 1], size=N)
+
+    if incl_leis:
+        e_maj_leis = 1
+        leisure = (
+            5 + b_maj_leis * major + np.random.normal(loc=0, scale=e_maj_leis, size=N)
+        )
+    else:
+        leisure = 0
+
+    e_gpa = 10
+    gpa = (
+        80
+        + b_maj_gpa * major
+        + b_leis_gpa * leisure
+        + np.random.normal(loc=0, scale=e_gpa, size=N)
+    )
+
+    e_salary = 10000
+    salary = (
+        50000
+        + b_maj_salary * major
+        + b_gpa_salary * gpa
+        + b_leis_salary * leisure
+        + np.random.normal(loc=0, scale=e_salary, size=N)
+    )
+
+    return pd.DataFrame(
+        {"salary": salary, "major": major, "gpa": gpa, "leisure": leisure}
+    )
+
+
+reg_data = gen_data(
+    N,
+    b_maj_salary=beta_econ,
+    b_gpa_salary=beta_grade,
+    b_maj_gpa=gamma_econ,
+    incl_leis=False,
+)
+
+
+def plot_salary_gpa(data, formula):
+    # Extract regression coefficients
+    model = smf.ols(formula=formula, data=data).fit()
+    beta_gpa_est = model.params["gpa"]
+    beta_const = model.params["Intercept"]
+
+    # Generate regression line
+    gpa_range = np.linspace(data["gpa"].min(), data["gpa"].max(), 100)
+    salary_pred = beta_const + beta_gpa_est * gpa_range
+
+    # Create figure and axes
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.scatter(
+        data["gpa"], data["salary"], alpha=0.6, label="Observed Data (all majors)"
+    )
+    ax.plot(
+        gpa_range,
+        salary_pred,
+        color="red",
+        linewidth=2,
+        label=f"Regression Line: Salary = {beta_const:.0f} + {beta_gpa_est:.0f}×grade",
+    )
+
+    # Add labels, legend, and title
+    ax.set_xlabel("Grade", fontweight="bold")
+    ax.set_ylabel("Salary (Thousands USD)", fontweight="bold")
+    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x/1000:.0f}k"))
+
+    # ax.set_title("Salary as a Function of GPA", fontweight="bold")
+    ax.set_xlim([0, 115])
+    ax.set_ylim([0, 300000])
+    ax.legend(loc="upper left")
+    ax.grid(alpha=0.3)
+
+    return fig
+
+
+def plot_salary_gpa_major(data, formula="salary ~ gpa + major"):
+    # Fit the regression model
+    model = smf.ols(formula=formula, data=data).fit()
+    beta_const = model.params["Intercept"]
+    beta_gpa = model.params["gpa"]
+    beta_major = model.params["major"]
+
+    # Generate GPA range
+    gpa_range = np.linspace(data["gpa"].min(), data["gpa"].max(), 100)
+
+    # Predict salary for each major group
+    salary_major_0 = beta_const + beta_gpa * gpa_range  # For major = 0
+    salary_major_1 = beta_const + beta_gpa * gpa_range + beta_major  # For major = 1
+
+    # Create figure and axes
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Scatter plot with color coding for major
+    colors = data["major"].map({0: thm.set1_purple, 1: thm.set1_orange})
+
+    ax.scatter(data["gpa"], data["salary"], c=colors, alpha=0.6)
+
+    # Plot regression lines
+    ax.plot(
+        gpa_range,
+        salary_major_0,
+        color=thm.set1_purple,
+        linewidth=2,
+        label="Econ=0: Salary = " f"{beta_const:.0f} + {beta_gpa:.0f}xgrade",
+    )
+    ax.plot(
+        gpa_range,
+        salary_major_1,
+        color=thm.set1_orange,
+        linewidth=2,
+        label="Econ=1: Salary = " f"{beta_const+beta_major:.0f} + {beta_gpa:.0f}xgrade",
+    )
+
+    # Add labels, legend, and title
+    ax.set_xlabel("Grade", fontweight="bold")
+    ax.set_ylabel("Salary (Thousands USD)", fontweight="bold")
+    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x/1000:.0f}k"))
+
+    # ax.set_title("Salary as a Function of GPA and Major", fontweight="bold")
+    ax.legend(loc="upper left")
+    ax.set_xlim([0, 115])
+    ax.set_ylim([0, 300000])
+    ax.legend(loc="upper left")
+    ax.grid(alpha=0.3)
+
+    return fig
+
+
+chart1_col, chart2_col = st.columns(2)
+
+with chart1_col:
+    st.markdown("#### Salary vs GPA")
+    st.pyplot(plot_salary_gpa(reg_data, "salary ~ gpa"))
+
+
+with chart2_col:
+    st.markdown("#### Salary vs GPA, by Major")
+    st.pyplot(plot_salary_gpa_major(reg_data, "salary ~ gpa + major"))
+
+s1, c03, s2 = utl.wide_col()
+
+with c03:
+    ovb_model = smf.ols(formula="salary ~ gpa", data=reg_data).fit()
+    alpha_gpa_ovb = ovb_model.params["gpa"]
+
+    true_model = smf.ols(formula="salary ~ gpa + major", data=reg_data).fit()
+    beta_gpa_est = true_model.params["gpa"]
+    beta_econ_est = true_model.params["major"]
+
+    model_gpa_major = smf.ols(formula="major ~ gpa", data=reg_data).fit()
+    gamma_major_gpa = model_gpa_major.params["gpa"]
+
+    st.markdown(
+        r"Parameter estimates:"
+        + r" $\hat{\alpha}_{grade}$"
+        + f" = {alpha_gpa_ovb:.1f};      "
+        + r"$\hat{\beta}_{grade}$"
+        + f" = {beta_gpa_est:.1f};     "
+        + r" $\hat{\beta}_{econ}$"
+        + f" = {beta_econ_est:.1f};     "
+        + r"$\hat{\gamma}_{econ\_on\_grade}$"
+        + f" = {gamma_major_gpa:.3f}.",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        r"OVB: $\hat{\alpha}_{grade} - \hat{\beta}_{grade}$"
+        + f" = {alpha_gpa_ovb-beta_gpa_est:.1f}. Using OVB formula: "
+        + r" $\hat{\beta}_{econ} \times \frac{cov(grade, econ)}{var(grade)} = \hat{\beta}_{econ} \times \hat{\gamma}_{econ\_on\_grade}$"
+        + f" = {beta_econ_est * gamma_major_gpa:.1f}.",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        r"OVB relative to true population parameter: $\hat{\alpha}_{grade} - \beta_{grade}$"
+        + f" = {alpha_gpa_ovb-beta_grade:.1f}.",
+        unsafe_allow_html=True,
+    )
+
+with c03:
+    st.markdown(
+        r"""Simpson's Paradox refers to a situation where the aggregate effect has the opposite sign than the within-group effect.
+                This can be viewed as omitting the group variable (and potentially the interaction between group and the variable of interest),
+                 which is a relevant factor in the true DGP. In our case, we saw that if $econ$ has a relatively strong effect on $salary$ and $grade$,
+                 while $grade$ has a relatively weak effect on salary, then omitting $econ$ from the regression will give a false sign on the $grade$ effect."""
+    )
