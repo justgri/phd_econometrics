@@ -1607,7 +1607,7 @@ with c05:
         + rf"""= {beta_est_const:0f}+ {beta_est_gpa:.0f} x grade + {beta_est_major:.0f} x econ + {beta_est_leis:.0f} x leis"""
     )
 
-    st.markdown(r"#### Case 1 - only include $grade$")
+    st.markdown(r"#### Case 1 - if only $grade$ is included")
     st.latex(
         r"""
         \begin{array}{l l}
@@ -1638,11 +1638,11 @@ with c05:
         r"Using OVB formula: "
         + r""" $\hat{\beta}_{econ} \frac{cov(grade, econ)}{var(grade)} + \hat{\beta}_{leis} \frac{cov(grade, leis)}{var(grade)} 
         = \hat{\beta}_{econ} \hat{\gamma}_{econ\_on\_grade} + \hat{\beta}_{leis} \hat{\gamma}_{leis\_on\_grade}$"""
-        + f" = {beta_est_major * gamma_gpa_major + beta_est_leis * gamma_gpa_leis:.0f}.",
+        + f" = {beta_est_major * gamma_gpa_major:.0f} + {beta_est_leis * gamma_gpa_leis:.0f} = {beta_est_major * gamma_gpa_major + beta_est_leis * gamma_gpa_leis:.0f}.",
         unsafe_allow_html=True,
     )
 
-    st.markdown(r"#### Case 2 - include $grade$ and $leisure$")
+    st.markdown(r"#### Case 2 - if $grade$ and $leisure$ are included")
 
     st.latex(
         r"""
@@ -1676,4 +1676,167 @@ with c05:
     st.markdown(
         r"OVB on leisure: $\hat{\alpha}_{leis} - \hat{\beta}_{leis}$"
         + f" = {alpha_est_leisure_2-beta_est_leis:.0f}."
+    )
+
+    st.markdown(r"**Understanding OVB formula with matrix algebra**")
+
+    st.markdown(
+        "Confirm the estimated bias by decomposing the OVB formula with matrix algebra:"
+        + r"$E[\hat{\alpha}]-\beta=\beta_q (X'X)^{-1}X'q$, where $q$ is the omitted variable. In our example, $\beta_q$ is $\beta_{econ}$ and $X = [1 \; grade \; leisure]$"
+    )
+
+form_col1, form_col2, form_col3, form_col4, form_col5 = st.columns([1.5, 1, 1, 1, 1])
+
+with form_col1:
+    st.markdown(r"$[X'X]$")
+    X = reg_data_leisure[["gpa", "leisure"]].to_numpy()
+    X = np.hstack((np.ones((X.shape[0], 1)), X))
+
+    XtX = np.dot(X.T, X)
+    XtX_inv = np.linalg.inv(XtX)
+    st.write(XtX)
+
+with form_col2:
+    st.markdown(r"$[X'X]^{-1}$")
+    XtX_inv = np.linalg.inv(XtX)
+    st.write(XtX_inv)
+
+with form_col3:
+    st.markdown(r"$X'q$")
+    q = reg_data_leisure[["major"]].to_numpy()
+    Xtq = np.dot(X.T, q)
+    st.write(Xtq)
+
+with form_col4:
+    st.markdown(r"$(X'X)^{-1}X'q$")
+    XtX_inv_Xtq = np.dot(XtX_inv, Xtq)
+    st.write(XtX_inv_Xtq)
+
+with form_col5:
+    st.markdown(r"$\beta_{q}(X'X)^{-1}X'q$")
+    bias = beta_est_major * XtX_inv_Xtq
+    st.write(bias)
+
+s1, c06, s2 = utl.wide_col()
+
+with c06:
+    model_major = smf.ols(formula="major ~ gpa + leisure", data=reg_data_leisure).fit()
+
+    gamma_est_major_on_gpa = model_major.params["gpa"]
+    gamma_est_major_on_leis = model_major.params["leisure"]
+
+    st.markdown(
+        r"What we did is identical to running the regression of omitted variable (econ) on included covariates (grade, leisure) and multiplying them by the $\beta$ estimate on omitted variable (econ) from the true DGP."
+    )
+    st.markdown(
+        r"Sample estimates from econ ~ grade + leisure:  "
+        + r"$\hat{\gamma}_{grade}$"
+        + f"= {gamma_est_major_on_gpa:.3f}; "
+        + r" $\hat{\gamma}_{leis}$"
+        + f"= {gamma_est_major_on_leis:.3f}",
+    )
+
+    st.markdown(
+        r"Multiply them both by $\hat{\beta}_{econ}=$"
+        + f"{beta_est_major:.0f}"
+        + r" to get the bias on $\hat{\alpha}_{grade}$ and $\hat{\alpha}_{leis}$"
+    )
+    st.markdown(
+        r"OVB on $\hat{\alpha}_{grade}$: "
+        + f"{beta_est_major*gamma_est_major_on_gpa:.0f}"
+    )
+    st.markdown(
+        r"OVB on $\hat{\alpha}_{leis}$: "
+        + f"{beta_est_major*gamma_est_major_on_leis:.0f}"
+    )
+
+    st.markdown(r"**Estimating OVB through partitioned regressions**")
+
+    st.markdown(
+        r"As another alternative, we can use FWL theorem for partitioned regressions to first net out the effects of one covariate, and estimate the OVB on the netted regression."
+    )
+
+    st.latex(
+        r"""
+        \begin{array}{l l}
+            \text{True DGP:} & \tilde{salary}_i = \beta_0 + \beta_{grade} \tilde{grade}_i + \beta_{econ} \tilde{econ}_i + \varepsilon_i \\
+            & \text{where $\tilde{z}_i$ is residuals from regressing variable $z$ on $leis$ alone} \\            
+            \text{Estimated DGP (omit econ):} & \tilde{salary}_i = \alpha_0 + \alpha_{grade} \tilde{grade}_i + u_i \\
+            \text{OVB on $grade$:} & E[\hat{\alpha}_{grade}] - \beta_{grade} = \beta_{econ} \frac{cov(\tilde{grade}, \tilde{econ})}{var(\tilde{grade})}\\
+        \end{array}
+        """
+    )
+
+
+# Step 1: Residualize salary, grade, and econ on leisure
+model_salary_leis = smf.ols("salary ~ leisure", data=reg_data_leisure).fit()
+tilde_salary = model_salary_leis.resid
+
+model_grade_leis = smf.ols("gpa ~ leisure", data=reg_data_leisure).fit()
+tilde_grade = model_grade_leis.resid
+
+model_econ_leis = smf.ols("major ~ leisure", data=reg_data_leisure).fit()
+tilde_econ = model_econ_leis.resid
+
+# Step 2: Run the true netted reg of residualized salary on residualized grade and major
+model_tilde_salary_true = smf.ols(
+    "tilde_salary ~ tilde_grade + tilde_econ",
+    data=pd.DataFrame(
+        {
+            "tilde_salary": tilde_salary,
+            "tilde_grade": tilde_grade,
+            "tilde_econ": tilde_econ,
+        }
+    ),
+).fit()
+
+beta_tilde_grade = model_tilde_salary_true.params["tilde_grade"]
+beta_tilde_econ = model_tilde_salary_true.params["tilde_econ"]
+
+
+# Step 3: Run the OVB netted reg of residualized salary on residualized grade
+model_tilde_salary_ovb = smf.ols(
+    "tilde_salary ~ tilde_grade",
+    data=pd.DataFrame({"tilde_salary": tilde_salary, "tilde_grade": tilde_grade}),
+).fit()
+
+alpha_tilde_grade = model_tilde_salary_ovb.params["tilde_grade"]
+
+# Step 3: Run reg of tilde_econ on tilde_grade
+model_tilde_econ = smf.ols(
+    "tilde_econ ~ tilde_grade",
+    data=pd.DataFrame({"tilde_econ": tilde_econ, "tilde_grade": tilde_grade}),
+).fit()
+
+gamma_tilde_grade = model_tilde_econ.params["tilde_grade"]
+
+# Step 4: Compute OVB using the formula
+ovb_tilde_grade = beta_tilde_econ * gamma_tilde_grade
+
+with c06:
+
+    # Step 5: Display results
+    st.markdown(
+        r"Estimated $\hat{\beta}_{grade}$ from the true netted model is: "
+        + f"{beta_tilde_grade:.0f}"
+        + r", which is equal to $\hat{\beta}_{grade}$ without netting out leisure (confirms that FWL theorem works)."
+    )
+
+    st.markdown(
+        r"Estimated $\hat{\alpha}_{grade}$:"
+        + f"{alpha_tilde_grade:.0f}, which again confirms that FWL theorem works."
+    )
+    st.markdown(
+        r"Estimated OVB on grade: $\hat{\alpha}_{grade} - \hat{\beta}_{grade} = $"
+        + f"{alpha_tilde_grade - beta_tilde_grade:.0f}"
+    )
+    st.markdown(
+        r"OVB on grade calculated using OVB formula: $\beta_{econ} \frac{cov(\tilde{grade}, \tilde{econ})}{var(\tilde{grade})}=$"
+        + f"{beta_tilde_econ:.0f} x {gamma_tilde_grade:.3f} = {beta_tilde_econ * gamma_tilde_grade:.0f}"
+    )
+
+    st.markdown(
+        r"""As expected, **all the methods give the same result**, but understanding each of them is useful
+        to get better intuition behind the OVB (e.g., FWL shows clearly how a strong correlation between leisure and major can reduce the OVB on the grade coefficient,
+        while regressing OV on covariates shows how the bias propagates to all coefficients even if only one is correlated with the OV)."""
     )
